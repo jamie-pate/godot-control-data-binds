@@ -9,19 +9,13 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "Label",
-"class": "BoundLabel",
-"language": "GDScript",
-"path": "res://addons/DataBindControls/BoundLabel.gd"
-}, {
 "base": "Node",
-"class": "DataBinds",
+"class": "Binds",
 "language": "GDScript",
-"path": "res://addons/DataBindControls/DataBinds.gd"
+"path": "res://addons/DataBindControls/Binds.gd"
 } ]
 _global_script_class_icons={
-"BoundLabel": "",
-"DataBinds": ""
+"Binds": ""
 }
 
 [application]
@@ -29,10 +23,6 @@ _global_script_class_icons={
 config/name="DataBinds"
 run/main_scene="res://Control.tscn"
 config/icon="res://icon.png"
-
-[editor_plugins]
-
-enabled=PoolStringArray( "res://addons/DataBindControls/plugin.cfg" )
 
 [physics]
 
