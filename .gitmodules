@@ -1,0 +1,6 @@
+[submodule "contrib/gdformat-plugin"]
+	path = contrib/gdformat-plugin
+	url = https://gitlab.com/DonatienBdR/gdformat-plugin.git
+[submodule "contrib/gut"]
+	path = contrib/gut
+	url = https://github.com/bitwes/Gut.git

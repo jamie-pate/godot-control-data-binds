@@ -13,9 +13,27 @@ _global_script_classes=[ {
 "class": "Binds",
 "language": "GDScript",
 "path": "res://addons/DataBindControls/Binds.gd"
+}, {
+"base": "Reference",
+"class": "GutHookScript",
+"language": "GDScript",
+"path": "res://addons/gut/hook_script.gd"
+}, {
+"base": "Node",
+"class": "GutTest",
+"language": "GDScript",
+"path": "res://addons/gut/test.gd"
+}, {
+"base": "Node",
+"class": "Repeat",
+"language": "GDScript",
+"path": "res://addons/DataBindControls/Repeat.gd"
 } ]
 _global_script_class_icons={
-"Binds": ""
+"Binds": "",
+"GutHookScript": "",
+"GutTest": "",
+"Repeat": ""
 }
 
 [application]
@@ -23,6 +41,10 @@ _global_script_class_icons={
 config/name="DataBinds"
 run/main_scene="res://Control.tscn"
 config/icon="res://icon.png"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/DataBindControls/plugin.cfg", "res://addons/gdformat/plugin.cfg", "res://addons/gut/plugin.cfg" )
 
 [physics]
 

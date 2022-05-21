@@ -1,8 +1,7 @@
 tool
 extends EditorPlugin
 
-const InspectorPlugin := preload('./InspectorPlugin.gd')
-
+const InspectorPlugin := preload("./InspectorPlugin.gd")
 
 var inspector: EditorInspectorPlugin = null
 
@@ -19,17 +18,17 @@ func _exit_tree():
 	var s: GDScript = inspector.get_script() if inspector else null
 	inspector = null
 	if s:
-		print('script reload!')
+		print("script reload!")
 		s.reload()
 
 
-func handles(object: Object) -> bool:
+func handles(_object: Object) -> bool:
 	return false
 
 
-func make_visible(show: bool) -> void:
+func make_visible(_show: bool) -> void:
 	pass
 
 
-func edit(object: Object) -> void:
+func edit(_object: Object) -> void:
 	pass
