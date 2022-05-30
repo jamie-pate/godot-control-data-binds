@@ -35,6 +35,9 @@ func _get_property_list():
 		if p.name in SIGNAL_PROPS:
 			if parent.has_signal(SIGNAL_PROPS[p.name]):
 				p.hint_text = "BoundProperty"
+		if !_binds.get(p.name):
+			# don't store bindings that are empty
+			p.usage = p.usage & ~PROPERTY_USAGE_STORAGE
 		p.erase("hint")
 		p.erase("hint_string")
 		p.type = TYPE_STRING
