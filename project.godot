@@ -30,10 +30,10 @@ _global_script_classes=[ {
 "path": "res://addons/DataBindControls/Repeat.gd"
 } ]
 _global_script_class_icons={
-"Binds": "",
+"Binds": "res://addons/DataBindControls/icons/link.svg",
 "GutHookScript": "",
 "GutTest": "",
-"Repeat": ""
+"Repeat": "res://addons/DataBindControls/icons/links.svg"
 }
 
 [application]

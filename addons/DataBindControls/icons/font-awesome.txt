@@ -1,0 +1,2 @@
+Icons are based on the fontawesome icon set which uses the CC BY 4.0 license:
+https://fontawesome.com/license/free

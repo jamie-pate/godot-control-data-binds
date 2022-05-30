@@ -19,3 +19,9 @@ The `Repeat` node should be added as a child of an _Instanced Child Scene_ and a
 All gdscript files should conform to gdformat and pass gdlint from [godot-gdscript-toolkit](https://github.com/Scony/godot-gdscript-toolkit). See the [installation procedure](https://github.com/Scony/godot-gdscript-toolkit#installation)
 
 Run `./update_addons.sh` to checkout submodules etc. Run `check.sh` to check whether all files are passing the format/lint checks. (see `check.sh --help` for more info)
+
+
+## Icons
+
+Icons are based on the fontawesome icon set which uses the CC BY 4.0 license:
+https://fontawesome.com/license/free

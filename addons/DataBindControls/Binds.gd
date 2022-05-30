@@ -1,5 +1,5 @@
 tool
-class_name Binds
+class_name Binds, "./icons/link.svg"
 extends Node
 
 const BindTarget := preload("./BindTarget.gd")

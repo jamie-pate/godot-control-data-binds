@@ -1,5 +1,5 @@
 tool
-class_name Repeat
+class_name Repeat, "./icons/links.svg"
 extends Node
 
 const Util := preload("./Util.gd")
