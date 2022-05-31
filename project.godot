@@ -9,6 +9,16 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Binds",
+"class": "BindItems",
+"language": "GDScript",
+"path": "res://addons/DataBindControls/BindItems.gd"
+}, {
+"base": "Node",
+"class": "BindRepeat",
+"language": "GDScript",
+"path": "res://addons/DataBindControls/BindRepeat.gd"
+}, {
 "base": "Node",
 "class": "Binds",
 "language": "GDScript",
@@ -23,17 +33,13 @@ _global_script_classes=[ {
 "class": "GutTest",
 "language": "GDScript",
 "path": "res://addons/gut/test.gd"
-}, {
-"base": "Node",
-"class": "Repeat",
-"language": "GDScript",
-"path": "res://addons/DataBindControls/Repeat.gd"
 } ]
 _global_script_class_icons={
+"BindItems": "res://addons/DataBindControls/icons/list.svg",
+"BindRepeat": "res://addons/DataBindControls/icons/links.svg",
 "Binds": "res://addons/DataBindControls/icons/link.svg",
 "GutHookScript": "",
-"GutTest": "",
-"Repeat": "res://addons/DataBindControls/icons/links.svg"
+"GutTest": ""
 }
 
 [application]

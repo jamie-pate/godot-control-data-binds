@@ -22,9 +22,33 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 margin_right = 600.0
-margin_bottom = 14.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+margin_right = 576.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/TextureRect"]
+script = ExtResource( 2 )
+texture = "model.icon"
+script = ExtResource( 2 )
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 580.0
+margin_right = 600.0
+margin_bottom = 20.0
+text = "X"
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+margin_top = 24.0
+margin_right = 600.0
+margin_bottom = 38.0
 
 [node name="Binds" type="Node" parent="VBoxContainer/Label"]
 script = ExtResource( 2 )
@@ -32,9 +56,9 @@ text = "model.text"
 script = ExtResource( 2 )
 
 [node name="CheckBox" type="CheckBox" parent="VBoxContainer"]
-margin_top = 18.0
+margin_top = 42.0
 margin_right = 600.0
-margin_bottom = 42.0
+margin_bottom = 66.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -45,9 +69,9 @@ pressed = "model.pressed"
 script = ExtResource( 2 )
 
 [node name="CheckButton" type="CheckButton" parent="VBoxContainer"]
-margin_top = 46.0
+margin_top = 70.0
 margin_right = 600.0
-margin_bottom = 86.0
+margin_bottom = 110.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -58,9 +82,9 @@ pressed = "model.pressed"
 script = ExtResource( 2 )
 
 [node name="TextEdit3" type="TextEdit" parent="VBoxContainer"]
-margin_top = 90.0
+margin_top = 114.0
 margin_right = 600.0
-margin_bottom = 90.0
+margin_bottom = 114.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -71,9 +95,9 @@ text = "model.text"
 script = ExtResource( 2 )
 
 [node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
-margin_top = 94.0
+margin_top = 118.0
 margin_right = 600.0
-margin_bottom = 118.0
+margin_bottom = 142.0
 
 [node name="Binds" type="Node" parent="VBoxContainer/LineEdit"]
 script = ExtResource( 2 )
@@ -81,9 +105,9 @@ text = "model.text"
 script = ExtResource( 2 )
 
 [node name="TextEdit" type="TextEdit" parent="VBoxContainer"]
-margin_top = 122.0
+margin_top = 146.0
 margin_right = 600.0
-margin_bottom = 122.0
+margin_bottom = 146.0
 text = "text: root1
 pressed: False
 array: 
@@ -96,10 +120,4 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Button" type="Button" parent="VBoxContainer"]
-margin_top = 126.0
-margin_right = 600.0
-margin_bottom = 146.0
-text = "Remove"
-
-[connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_Button_pressed"]

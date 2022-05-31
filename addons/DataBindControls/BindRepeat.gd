@@ -1,5 +1,5 @@
 tool
-class_name Repeat, "./icons/links.svg"
+class_name BindRepeat, "./icons/links.svg"
 extends Node
 
 const Util := preload("./Util.gd")
@@ -32,6 +32,7 @@ func _deferred_ready():
 				sc.erase("target")
 				_template_connections.append(sc)
 
+	# we have to finish the _ready() callback _before_ we can do any of this
 	var tparent = _template.get_parent()
 	# preserve owner because remove_child() will delete it.
 	# _enter_tree() will use this value to reset the owner
@@ -58,9 +59,9 @@ func _set_target_property(value: String) -> void:
 
 
 func _on_model_mutated(event: MutationEvent):
-	var array_model = event.get_model()
 	if Engine.editor_hint:
 		return
+	var array_model = event.get_model()
 	if !_template:
 		return
 	var p := get_parent()
@@ -86,9 +87,9 @@ func _on_model_mutated(event: MutationEvent):
 	if !event.removed:
 		if event.index < 0:
 			for i in range(array_model.size()):
-				_assign_item(p.get_child(i), array_model.get_i(i))
+				_assign_item(p.get_child(i), array_model.get_at(i))
 		else:
-			_assign_item(p.get_child(event.index), array_model.get_i(event.index))
+			_assign_item(p.get_child(event.index), array_model.get_at(event.index))
 
 
 func _assign_item(child, item):

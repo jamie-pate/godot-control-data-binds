@@ -14,6 +14,10 @@ The `Binds` node will automatically mirror the property names of it's parent `Co
 
 The `Repeat` node should be added as a child of an _Instanced Child Scene_ and allows that scene to be used as a template which will be repeated for each item in it's bound `ArrayModel`. Set the `array_bind` and `target_property` properties on the `Repeat` node to bind to an `ArrayModel`.
 
+## Binding to ItemList etc
+
+The `BindItems` node can be added as a child of a `ItemList`, `PopupMenu` or `OptionButton` node to bind to their item list. the `item_selected` bind will sync the selected status of each item to the model in both directions. Set the `array_bind` property to the model path for the `ArrayModel` which contains your item data.
+
 ## Development
 
 All gdscript files should conform to gdformat and pass gdlint from [godot-gdscript-toolkit](https://github.com/Scony/godot-gdscript-toolkit). See the [installation procedure](https://github.com/Scony/godot-gdscript-toolkit#installation)

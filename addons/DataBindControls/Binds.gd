@@ -20,6 +20,11 @@ var _binds := {}
 
 
 func _get_property_list():
+	# it seems impossible to do an inherited call of _get_property_list() directly.
+	return _binds_get_property_list()
+
+
+func _binds_get_property_list():
 	var parent := get_parent()
 	if !parent:
 		return []
@@ -45,6 +50,8 @@ func _get_property_list():
 
 
 func _set(prop_name, value):
+	# if this happens at runtime we need to _bind_targets() and _unbind_targets()
+	assert(Engine.editor_hint || !is_inside_tree())
 	if prop_name in PASSTHROUGH_PROPS:
 		var method_name = ("set%s" if prop_name.begins_with("_") else "set_%s") % prop_name
 		if has_method(method_name):
@@ -67,45 +74,66 @@ func _get(prop_name):
 func _enter_tree():
 	if Engine.editor_hint:
 		return
+	_bind_targets()
+
+
+func _bind_targets():
 	var parent := get_parent()
 	for p in _binds:
-		if p in PASSTHROUGH_PROPS:
-			continue
-		var b := _binds[p] as String
-		if b:
-			var bt = BindTarget.new(b, owner)
-			if bt.target:
-				parent[p] = bt.get_value()
-				if bt.target.has_signal("mutated"):
-					var err = bt.target.connect("mutated", self, "_on_model_mutated")
-					assert(err == OK)
-		var sig_map = Util.get_sig_map(parent)
-		if p in SIGNAL_PROPS:
-			var sig = SIGNAL_PROPS[p]
-			if sig in sig_map:
-				var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
-				var err = parent.connect(SIGNAL_PROPS[p], self, method, [p])
+		_bind_target(p, parent)
+
+
+func _bind_target(p: String, parent: Node) -> void:
+	if !parent:
+		parent = get_parent()
+	if p in PASSTHROUGH_PROPS:
+		return
+	var b := _binds[p] as String
+	if b:
+		var bt = BindTarget.new(b, owner)
+		if bt.target:
+			parent[p] = bt.get_value()
+			if bt.target.has_signal("mutated"):
+				var err = bt.target.connect("mutated", self, "_on_model_mutated")
 				assert(err == OK)
+	var sig_map = Util.get_sig_map(parent)
+	if p in SIGNAL_PROPS:
+		var sig = SIGNAL_PROPS[p]
+		if sig in sig_map:
+			var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
+			var err = parent.connect(SIGNAL_PROPS[p], self, method, [p])
+			assert(err == OK)
 
 
 func _exit_tree():
 	if Engine.editor_hint:
 		return
+	_unbind_targets()
+
+
+func _unbind_targets():
 	var parent := get_parent()
+	assert(parent)
 	for p in _binds:
-		if p in PASSTHROUGH_PROPS:
-			continue
-		var b := _binds[p] as String
-		if b:
-			var bt = BindTarget.new(b, owner)
-			if bt.target && bt.target.has_signal("mutated"):
-				bt.target.disconnect("mutated", self, "_on_model_mutated")
-		var sig_map = Util.get_sig_map(parent)
-		if p in SIGNAL_PROPS:
-			var sig = SIGNAL_PROPS[p]
-			if sig in sig_map:
-				var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
-				parent.disconnect(SIGNAL_PROPS[p], self, method)
+		_unbind_target(p, parent)
+
+
+func _unbind_target(p: String, parent: Node):
+	if p in PASSTHROUGH_PROPS:
+		return
+	if !parent:
+		parent = get_parent()
+	var b := _binds[p] as String
+	if b:
+		var bt = BindTarget.new(b, owner)
+		if bt.target && bt.target.has_signal("mutated"):
+			bt.target.disconnect("mutated", self, "_on_model_mutated")
+	var sig_map = Util.get_sig_map(parent)
+	if p in SIGNAL_PROPS:
+		var sig = SIGNAL_PROPS[p]
+		if sig in sig_map:
+			var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
+			parent.disconnect(SIGNAL_PROPS[p], self, method)
 
 
 func _on_parent_prop_changed0(prop_name: String):

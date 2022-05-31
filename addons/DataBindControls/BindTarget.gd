@@ -13,7 +13,7 @@ func _init(_path: String, _root):
 	var t = root
 	while len(path) > 1:
 		var p = path.pop_front()
-		if p in t:
+		if t is Object && p in t:
 			t = t[p]
 		else:
 			printerr("Unable to find bind %s on %s" % [full_path, root.get_path()])

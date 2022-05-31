@@ -107,7 +107,7 @@ func _get(prop_name):
 		if has_method(method_name):
 			return call(method_name)
 		return call("_%s" % [method_name])
-	return _data.get(prop_name, "")
+	return _data.get(prop_name, null)
 
 
 func _emit_deep_mutated(e: MutationEvent, path: Array) -> void:

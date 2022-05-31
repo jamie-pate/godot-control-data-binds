@@ -89,12 +89,12 @@ func slice(begin: int, end: int, step := 1, deep := false) -> Array:
 
 
 # unfortunately gdscript has no way to overload the [] operator
-func get_i(index: int):
+func get_at(index: int):
 	return _data[index]
 
 
 # unfortunately gdscript has no way to overload the [] operator
-func set_i(index: int, value) -> void:
+func set_at(index: int, value) -> void:
 	var old_value = _data[index] if len(_data) > index else null
 	_data[index] = value
 	_emit_mutated(index, [value], [old_value] if old_value != value else [])
