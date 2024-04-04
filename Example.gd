@@ -3,28 +3,29 @@ extends Panel
 
 signal remove(model)
 
-const DataModel := preload("res://addons/DataBindControls/DataModel.gd")
-const ArrayModel := preload("res://addons/DataBindControls/ArrayModel.gd")
+# Model classes here are named with the Model suffix but you could use any naming scheme
+const BaseModel = preload("./BaseModel.gd")
+const RootModel = preload("./RootModel.gd")
+const ItemModel = preload("./ItemModel.gd")
 
-var model := DataModel.new({text = "root1", pressed = false, array = ArrayModel.new([])})
-var model_yaml := DataModel.new({value = ""})
+var model = RootModel.new({text = "root1", pressed = false, array = [], time = "0", path = ""}) setget _set_model
+var model_yaml := {value=""}
 
 var _next_id = 0
 
 
 func _ready():
-	var a: ArrayModel = model.array
+	var a := model.array as Array
 	model.path = str(get_path())
-	a.append(DataModel.new({text = "repeat0", pressed = false, icon = _get_icon(0)}))
-	a.append(DataModel.new({text = "repeat1", pressed = true, icon = _get_icon(1)}))
+	a.append(ItemModel.new({text = "repeat0", pressed = false, icon = _get_icon(0)}))
+	a.append(ItemModel.new({text = "repeat1", pressed = true, icon = _get_icon(1)}))
 	_next_id = 2
-	print(a.get_at(0))
+	print("model.array[0] = %s : %s" % [ get_path(), a[0] ])
 
-	var err := model.connect("mutated", self, "_on_model_mutated")
-	assert(err == OK)
-	err = model.connect("deep_mutated", self, "_on_model_mutated")
-	model_yaml.value = _yaml(model)
 
+func _set_model(value):
+	model = value
+	assert(model, "Model can't be null, invalid type assignment?")
 
 func _get_icon(i: int):
 	var icons = [
@@ -35,13 +36,9 @@ func _get_icon(i: int):
 	return icons[i % len(icons)]
 
 
-func _on_model_mutated(e):
-	model_yaml.value = "event: %s\n%s" % [e, _yaml(e.get_model())]
-
-
 func _yaml(model, indent := "", indent_first := false) -> String:
 	var result := PoolStringArray()
-	if model is DataModel:
+	if model is BaseModel:
 		var first = true
 		for k in model.keys():
 			result.append(
@@ -55,10 +52,10 @@ func _yaml(model, indent := "", indent_first := false) -> String:
 				)
 			)
 			first = false
-	elif model is ArrayModel:
+	elif model is Array:
 		if !indent_first:
 			result.append("")
-		for item in model.values():
+		for item in model:
 			result.append("%s- %s" % [indent, _yaml(item, indent + "  ", false)])
 	else:
 		return "%s%s" % [indent if indent_first else "", model]
@@ -75,6 +72,23 @@ func _on_RepeatPanel_remove(value):
 
 func _on_AddButton_pressed():
 	model.array.append(
-		DataModel.new({text = "repeat%s" % [_next_id], pressed = false, icon = _get_icon(_next_id)})
+		ItemModel.new({text = "repeat%s" % [_next_id], pressed = false, icon = _get_icon(_next_id)})
 	)
 	_next_id += 1
+
+
+func _on_Timer_timeout():
+	## this is an example of when you need to call change detection.
+	## Ideally we would be able to hook into some of these at the engine level
+	## to automatically call detect_changes whenever a timeout or other async
+	## action happens similar to NgZone
+	model.time = str(OS.get_ticks_msec())
+	DataBindings.detect_changes()
+
+
+func _process(_delta: float):
+	var new_value = _yaml(model)
+	# we don't want to flood change detection
+	if model_yaml.value != new_value:
+		model_yaml.value = new_value
+		DataBindings.detect_changes()

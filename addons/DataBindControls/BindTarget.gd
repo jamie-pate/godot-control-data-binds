@@ -6,17 +6,18 @@ var target = null
 var prop := ""
 
 
-func _init(_path: String, _root):
+func _init(_path: String, _root, silent := false):
 	full_path = _path
 	root = _root
 	var path := Array(_path.split("."))
 	var t = root
 	while len(path) > 1:
 		var p = path.pop_front()
-		if t is Object && p in t:
+		if t != null && t is Object && p in t:
 			t = t[p]
 		else:
-			printerr("Unable to find bind %s on %s" % [full_path, root.get_path()])
+			if !silent:
+				printerr("Unable to find bind %s on %s" % [full_path, root.get_path() if root is Node else root])
 			break
 	if len(path) == 1:
 		prop = path[0]

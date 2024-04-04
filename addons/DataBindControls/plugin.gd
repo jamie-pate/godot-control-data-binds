@@ -11,9 +11,12 @@ func _enter_tree():
 	# can't use preload because the resource will stick in the cache otherwise
 	inspector = InspectorPlugin.new()
 	add_inspector_plugin(inspector)
+	var path = get_script().resource_path.get_base_dir()
+	add_autoload_singleton("DataBindings", "%s/DataBindingsGlobal.gd" % [ path ])
 
 
 func _exit_tree():
+	remove_autoload_singleton("DataBindings")
 	remove_inspector_plugin(inspector)
 	var s: GDScript = inspector.get_script() if inspector else null
 	inspector = null

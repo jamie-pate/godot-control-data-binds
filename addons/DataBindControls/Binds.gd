@@ -2,6 +2,8 @@ tool
 class_name Binds, "./icons/link.svg"
 extends Node
 
+## Bind properties against a single control
+
 const BindTarget := preload("./BindTarget.gd")
 const Util := preload("./Util.gd")
 
@@ -17,6 +19,10 @@ const SIGNAL_PROPS := {
 }
 
 var _binds := {}
+
+
+func _init():
+	add_to_group(Util.BIND_GROUP)
 
 
 func _get_property_list():
@@ -93,9 +99,6 @@ func _bind_target(p: String, parent: Node) -> void:
 		var bt = BindTarget.new(b, owner)
 		if bt.target:
 			parent[p] = bt.get_value()
-			if bt.target.has_signal("mutated"):
-				var err = bt.target.connect("mutated", self, "_on_model_mutated")
-				assert(err == OK)
 	var sig_map = Util.get_sig_map(parent)
 	if p in SIGNAL_PROPS:
 		var sig = SIGNAL_PROPS[p]
@@ -123,11 +126,6 @@ func _unbind_target(p: String, parent: Node):
 		return
 	if !parent:
 		parent = get_parent()
-	var b := _binds[p] as String
-	if b:
-		var bt = BindTarget.new(b, owner)
-		if bt.target && bt.target.has_signal("mutated"):
-			bt.target.disconnect("mutated", self, "_on_model_mutated")
 	var sig_map = Util.get_sig_map(parent)
 	if p in SIGNAL_PROPS:
 		var sig = SIGNAL_PROPS[p]
@@ -147,21 +145,27 @@ func _on_parent_prop_changed1(value, prop_name: String):
 		var bt = BindTarget.new(path, owner)
 		if bt.get_value() != value:
 			bt.set_value(value)
+			DataBindings.detect_changes()
 
 
-func _on_model_mutated(event):
-	var model = event.get_model()
+func detect_changes() -> bool:
+	var changes_detected = false
 	for p in _binds:
 		if p in PASSTHROUGH_PROPS:
 			continue
 		var b := _binds[p] as String
 		if b:
 			var bt = BindTarget.new(b, owner)
-			if bt.target == model && event.index == bt.prop:
+			if bt.target:
 				var parent = get_parent()
-				var cp
-				if "caret_position" in parent:
-					cp = parent.caret_position
-				parent[p] = bt.get_value()
-				if "caret_position" in parent:
-					parent.caret_position = cp
+				var value = bt.get_value()
+				if typeof(parent[p]) != typeof(value) || parent[p] != value:
+					changes_detected = true
+					var cp
+					if "caret_position" in parent:
+						cp = parent.caret_position
+					parent[p] = value
+					if "caret_position" in parent:
+						parent.caret_position = cp
+
+	return changes_detected

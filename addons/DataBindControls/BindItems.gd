@@ -2,9 +2,7 @@ tool
 class_name BindItems, "./icons/list.svg"
 extends Binds
 
-const ArrayModel := preload("./ArrayModel.gd")
-const MutationEvent := preload("./MutationEvent.gd")
-const DeepMutationEvent := preload("./DeepMutationEvent.gd")
+## Bind items in an array to items in an ItemList, PopupMenu, OptionButton etc
 
 export var array_bind: String setget _set_array_bind
 export var item_text: String setget _set_item_text
@@ -59,63 +57,35 @@ func _set_item_selected(value: String) -> void:
 func _ready() -> void:
 	if Engine.editor_hint:
 		return
-	var bt = BindTarget.new(array_bind, owner)
-	var value = bt.get_value() as ArrayModel
+	var value = _get_value()
 	if value:
-		_on_model_mutated(MutationEvent.new(value, -1, false))
+		detect_changes(value)
 
 
-func _on_model_mutated(event: MutationEvent) -> void:
-	if Engine.editor_hint:
-		return
-	var array_model = event.get_model()
-	assert(array_model is ArrayModel)
-	var size = array_model.size()
+func _get_value():
+	var bt = BindTarget.new(array_bind, owner)
+	return bt.get_value()
+
+
+func detect_changes(new_value := []) -> bool:
+	if len(new_value) == 0:
+		var v = _get_value()
+		new_value = v if v != null else []
+	var size = len(new_value)
 	var p = get_parent()
 	# TODO: maybe just check for has_method(`get_item_*`)?
 	assert(p is ItemList || p is PopupMenu || p is OptionButton)
-	# the repeat node should always be last, and every other node should be
-	# a repeated template instance
-	if event.removed && p.get_item_count() > event.index:
-		p.remove_item(event.index)
+
 	while size > p.get_item_count():
 		p.add_item("")
 	while size < p.get_item_count():
 		p.remove_item(p.get_item_count() - 1)
-	assert(event.index == -1 || event.removed || event.index < p.get_item_count())
 
-	if !event.removed:
-		if event.index < 0:
-			for i in range(array_model.size()):
-				_assign_item(p, i, array_model.get_at(i))
-		else:
-			_assign_item(p, event.index, array_model.get_at(event.index))
-
-
-func _on_model_deep_mutated(event: DeepMutationEvent):
-	if len(event.path) != 2 || !event.path[0] is int || !event.path[1] is String:
-		return
-	var idx = event.path[0]
-	var item_prop = event.path[1]
-	var bt = BindTarget.new(array_bind, owner)
-	var array_model = bt.get_value() if bt else null
-	if !array_model:
-		return
-	var parent = get_parent()
-	for p in get_script().get_script_property_list():
-		var bind_prop = self[p.name] if p.name.begins_with("item_") else ""
-		if p.name.begins_with("item_") && bind_prop && bind_prop == item_prop:
-			var value = array_model.get_at(event.path[0])[item_prop]
-			if p.name == "item_selected":
-				if value:
-					parent.select(idx, parent.select_mode == parent.SELECT_SINGLE)
-				else:
-					parent.unselect(idx)
-			else:
-				var method_name = "set_%s" % [p.name]
-				if parent.has_method(method_name):
-					parent.call(method_name, idx, array_model.get_at(idx)[item_prop])
-			break
+	# Todo: track items so we don't have to assign the entire array
+	var change_detected = false
+	for i in range(size):
+		change_detected = change_detected || _assign_item(p, i, new_value[i])
+	return change_detected
 
 
 func _on_parent_item_selected(idx: int) -> void:
@@ -128,7 +98,7 @@ func _on_parent_item_selected(idx: int) -> void:
 		selected[i] = 1
 	if array_model && item_selected:
 		for i in range(parent.get_item_count()):
-			var model = array_model.get_at(i)
+			var model = array_model[i]
 			var value = selected[i] == 1
 			if model[item_selected] != value:
 				model[item_selected] = value
@@ -138,23 +108,44 @@ func _on_parent_multi_selected(idx: int, selected: bool) -> void:
 	_on_parent_item_selected(idx)
 
 
-func _assign_item(parent: Node, i: int, item) -> void:
+func _assign_item(parent: Node, i: int, item) -> bool:
+	var change_detected := false
 	var pl = get_script().get_script_property_list()
 	for p in pl:
 		if p.name.begins_with("item_"):
-			var method_name = "set_%s" % [p.name]
+			var set_method_name := "set_%s" % [p.name]
+			var get_method_name := "get_%s" % [p.name]
+			if p.name == "item_selected":
+				# this property follows a different pattern and is only available
+				# on ItemList
+				set_method_name = "select"
+				get_method_name = "is_selected"
+
 			var model_prop = self[p.name]
-			if model_prop && parent.has_method(method_name) && model_prop in item:
-				parent.call(method_name, i, item[model_prop])
+			if model_prop && parent.has_method(get_method_name) && model_prop in item:
+				var new_value = item[model_prop]
+				var update := true
+				if parent.has_method(set_method_name):
+					var old_value = parent.call(get_method_name, i)
+					update = typeof(old_value) != typeof(new_value) || old_value != new_value
+					change_detected = change_detected || update
+				if update:
+					if set_method_name == "select":
+						if new_value:
+							# singleselect = false
+							parent.select(i, false)
+						else:
+							parent.unselect(i)
+					else:
+						parent.call(set_method_name, i, new_value)
+	return change_detected
 
 
 func _enter_tree():
-	_bind_items()
 	_bind_parent()
 
 
 func _exit_tree():
-	_unbind_items()
 	_unbind_parent()
 
 
@@ -171,26 +162,3 @@ func _unbind_parent():
 	parent.disconnect("multi_selected", self, "_on_parent_multi_selected")
 	parent.disconnect("item_selected", self, "_on_parent_item_selected")
 
-
-func _bind_items():
-	if !array_bind:
-		return
-	var bt = BindTarget.new(array_bind, owner)
-	var array_model = bt.get_value() if bt else null
-	if array_model:
-		if array_model.has_signal("deep_mutated"):
-			var err = array_model.connect("deep_mutated", self, "_on_model_deep_mutated")
-			assert(err == OK)
-		if array_model.has_signal("mutated"):
-			var err = array_model.connect("mutated", self, "_on_model_mutated")
-			assert(err == OK)
-
-
-func _unbind_items():
-	var bt = BindTarget.new(array_bind, owner)
-	var array_model = bt.get_value() if bt else null
-	if array_model:
-		if array_model.has_signal("deep_mutated"):
-			array_model.disconnect("deep_mutated", self, "_on_model_deep_mutated")
-		if array_model.has_signal("mutated"):
-			array_model.disconnect("mutated", self, "_on_model_mutated")

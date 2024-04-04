@@ -1,3 +1,4 @@
 /.import
 addons/*
 !addons/DataBindControls
+.py_venv

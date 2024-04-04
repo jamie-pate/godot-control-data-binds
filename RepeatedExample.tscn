@@ -35,6 +35,9 @@ margin_bottom = 20.0
 size_flags_horizontal = 3
 
 [node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/TextureRect"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 2 )
 texture = "model.icon"
 script = ExtResource( 2 )
@@ -51,6 +54,9 @@ margin_right = 600.0
 margin_bottom = 38.0
 
 [node name="Binds" type="Node" parent="VBoxContainer/Label"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 2 )
 text = "model.text"
 script = ExtResource( 2 )
@@ -64,6 +70,9 @@ __meta__ = {
 }
 
 [node name="Binds" type="Node" parent="VBoxContainer/CheckBox"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 2 )
 pressed = "model.pressed"
 script = ExtResource( 2 )
@@ -77,6 +86,9 @@ __meta__ = {
 }
 
 [node name="Binds" type="Node" parent="VBoxContainer/CheckButton"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 2 )
 pressed = "model.pressed"
 script = ExtResource( 2 )
@@ -90,6 +102,9 @@ __meta__ = {
 }
 
 [node name="Binds" type="Node" parent="VBoxContainer/TextEdit3"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 2 )
 text = "model.text"
 script = ExtResource( 2 )
@@ -100,6 +115,9 @@ margin_right = 600.0
 margin_bottom = 142.0
 
 [node name="Binds" type="Node" parent="VBoxContainer/LineEdit"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 2 )
 text = "model.text"
 script = ExtResource( 2 )

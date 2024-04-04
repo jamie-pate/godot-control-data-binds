@@ -1,12 +1,14 @@
 # Godot DataBind Controls
 
-A godot addon which facilitates data binding to enable an MVC pattern for GUI controls. Bind and Repeat nodes can be added inside leaf `Control` nodes and will automatically bind the control's properties to reflect a `DataModel`/`ArrayModel` object property of `owner`. Run the demo project at the top level of this repo to see `Example.gd` and `ExampleRepeat.gd` in action.
+A godot addon which facilitates data binding to enable an MVC pattern for GUI controls.
+Bind and Repeat nodes can be added inside leaf `Control` nodes and will automatically bind the
+control's properties to reflect an object property. Run the demo project at the top level of
+this repo to see `Example.gd` and `ExampleRepeat.gd` in action.
 
-## DataModel and ArrayModel
+## Detecting Changes
 
-All data must be contained in properties of the scene root. Data must be represented by a `DataModel` instance and arrays by `ArrayModel` instances. These special classes can track any changes to their properties/items and will emit `mutated` and `deep_mutated` signals when any property/item has been mutated.
-
-TODO:  explore 'extending' a `DataModel` instance to provide behavior OR proxy a class instance instead of a dictionary to allow a 'typed' `DataModel`?
+Instead of using a custom class as the base of all data models this version uses a global 'change detection'
+mechanism. Any place that may update data that needs to be reflected in the ui should call DataBindings.detect_changes()
 
 ## Using Bind and Repeat
 

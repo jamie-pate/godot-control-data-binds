@@ -2,18 +2,22 @@ tool
 class_name BindRepeat, "./icons/links.svg"
 extends Node
 
+## Bind items in an array to be repeated using the parent template.
+## Each array item will instance the template once in the grandparent control.
+
 const Util := preload("./Util.gd")
 const BindTarget := preload("./BindTarget.gd")
-const ArrayModel := preload("./ArrayModel.gd")
-const DataModel := preload("./DataModel.gd")
-const MutationEvent := preload("./MutationEvent.gd")
 
 export var array_bind: String setget _set_array_bind
 export var target_property: String setget _set_target_property
 
 var _template: Control = null
 var _template_connections := []
-var _owner = null
+var _owner
+
+
+func _init():
+	add_to_group(Util.BIND_GROUP)
 
 
 func _ready():
@@ -40,12 +44,16 @@ func _deferred_ready():
 	_template.remove_child(self)
 	tparent.add_child_below_node(_template, self)
 	tparent.remove_child(_template)
+	var value = _get_value(true)
+	if value != null:
+		detect_changes(value)
 
+
+func _get_value(silent := false):
 	if array_bind && target_property:
-		var bt = BindTarget.new(array_bind, owner)
-		var value = bt.get_value() as ArrayModel
-		if value:
-			_on_model_mutated(MutationEvent.new(value, -1, false))
+		var bt = BindTarget.new(array_bind, owner, silent)
+		return bt.get_value() if bt.target else null
+	return null
 
 
 func _set_array_bind(value: String) -> void:
@@ -58,18 +66,18 @@ func _set_target_property(value: String) -> void:
 	target_property = value
 
 
-func _on_model_mutated(event: MutationEvent):
-	if Engine.editor_hint:
-		return
-	var array_model = event.get_model()
+func detect_changes(new_value: Array = []) -> bool:
+	# TODO: track moved items instead of reassigning every time
 	if !_template:
-		return
+		return false
+	if len(new_value) == 0:
+		var v = _get_value()
+		new_value = v if v != null else []
 	var p := get_parent()
-	var size = array_model.size()
+	var size = len(new_value)
 	# the repeat node should always be last, and every other node should be
 	# a repeated template instance
-	if event.removed && p.get_child_count() - 1 > event.index:
-		p.remove_child(p.get_child(event.index))
+	var change_detected = size != p.get_child_count() - 1
 	while size > p.get_child_count() - 1:
 		var instance = _template.duplicate(DUPLICATE_USE_INSTANCING)
 		p.add_child(instance)
@@ -78,27 +86,20 @@ func _on_model_mutated(event: MutationEvent):
 			assert(err == OK)
 	raise()
 	while size < p.get_child_count() - 1:
-		var c := p.get_child(get_child_count() - 2)
+		var c := p.get_child(p.get_child_count() - 2)
 		assert(c is Control && c != self)
 		p.remove_child(c)
 		c.queue_free()
-	assert(event.index == -1 || event.removed || event.index < p.get_child_count() - 1)
-
-	if !event.removed:
-		if event.index < 0:
-			for i in range(array_model.size()):
-				_assign_item(p.get_child(i), array_model.get_at(i))
-		else:
-			_assign_item(p.get_child(event.index), array_model.get_at(event.index))
+	for i in range(size):
+		change_detected = change_detected || _assign_item(p.get_child(i), new_value[i])
+	return change_detected
 
 
 func _assign_item(child, item):
 	if array_bind && target_property in child:
-		var dm = child[target_property] as DataModel
+		var m = child[target_property]
 		if typeof(child[target_property]) != typeof(item) || child[target_property] != item:
 			child[target_property] = item
-		if dm && item is DataModel && dm != item:
-			item.copy_signals_from_and_emit_changes(dm)
 
 
 func _notification(what):
@@ -115,20 +116,3 @@ func _enter_tree():
 		owner = _owner
 		_owner = null
 		assert(owner)
-	if array_bind && owner && _template:
-		print(owner)
-		var bt = BindTarget.new(array_bind, owner)
-		var am := bt.get_value() as ArrayModel
-		if am:
-			var err := am.connect("mutated", self, "_on_model_mutated")
-			assert(err == OK)
-
-
-func _exit_tree():
-	if Engine.editor_hint:
-		return
-	if array_bind:
-		var bt = BindTarget.new(array_bind, owner)
-		var am := bt.get_value() as ArrayModel
-		if am:
-			am.disconnect("mutated", self, "_on_model_mutated")

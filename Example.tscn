@@ -13,42 +13,44 @@ bg_color = Color( 0.196078, 0.196078, 0.196078, 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 582.0
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
 margin_right = 510.0
-margin_bottom = 600.0
+margin_bottom = 582.0
 size_flags_horizontal = 3
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_right = 510.0
 margin_bottom = 118.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 margin_right = 510.0
 margin_bottom = 14.0
 
-[node name="Binds" type="Node" parent="HBoxContainer/VBoxContainer/VBoxContainer/Label"]
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/Label"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 1 )
 text = "model.text"
 script = ExtResource( 1 )
 
-[node name="CheckBox" type="CheckBox" parent="HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="CheckBox" type="CheckBox" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 margin_top = 18.0
 margin_right = 510.0
 margin_bottom = 42.0
@@ -56,12 +58,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Binds" type="Node" parent="HBoxContainer/VBoxContainer/VBoxContainer/CheckBox"]
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/CheckBox"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 1 )
 pressed = "model.pressed"
 script = ExtResource( 1 )
 
-[node name="CheckButton" type="CheckButton" parent="HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="CheckButton" type="CheckButton" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 margin_top = 46.0
 margin_right = 510.0
 margin_bottom = 86.0
@@ -69,12 +74,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Binds" type="Node" parent="HBoxContainer/VBoxContainer/VBoxContainer/CheckButton"]
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/CheckButton"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 1 )
 pressed = "model.pressed"
 script = ExtResource( 1 )
 
-[node name="TextEdit" type="TextEdit" parent="HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 margin_top = 90.0
 margin_right = 510.0
 margin_bottom = 90.0
@@ -82,63 +90,64 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Binds" type="Node" parent="HBoxContainer/VBoxContainer/VBoxContainer/TextEdit"]
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/TextEdit"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 1 )
 text = "model.text"
 script = ExtResource( 1 )
 
-[node name="LineEdit" type="LineEdit" parent="HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 margin_top = 94.0
 margin_right = 510.0
 margin_bottom = 118.0
 
-[node name="Binds" type="Node" parent="HBoxContainer/VBoxContainer/VBoxContainer/LineEdit"]
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/LineEdit"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 1 )
 text = "model.text"
 script = ExtResource( 1 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 122.0
 margin_right = 510.0
 margin_bottom = 142.0
 alignment = 1
 
-[node name="AddButton" type="Button" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="AddButton" type="Button" parent="VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 margin_left = 236.0
 margin_right = 273.0
 margin_bottom = 20.0
 text = "Add"
 
-[node name="TextEdit" type="TextEdit" parent="HBoxContainer/VBoxContainer"]
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 146.0
 margin_right = 510.0
-margin_bottom = 600.0
+margin_bottom = 582.0
 rect_min_size = Vector2( 0, 200 )
 size_flags_vertical = 3
-text = "text: root1
-pressed: False
-array: 
-  - text: repeat0
-    pressed: False
-  - text: repeat1
-    pressed: True
-path: /root/EditorNode/@@580/@@581/@@589/@@591/@@595/@@599/@@600/@@601/@@617/@@618/@@627/@@628/@@6066/@@5905/@@5906/@@5907/@@5908/@@5909/Panel"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Binds" type="Node" parent="HBoxContainer/VBoxContainer/TextEdit"]
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer/TextEdit"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 1 )
 text = "model_yaml.value"
 script = ExtResource( 1 )
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
 margin_left = 514.0
 margin_right = 1024.0
-margin_bottom = 600.0
+margin_bottom = 582.0
 size_flags_horizontal = 3
 
-[node name="ItemList" type="ItemList" parent="HBoxContainer/VBoxContainer2"]
+[node name="ItemList" type="ItemList" parent="VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_right = 510.0
 margin_bottom = 27.0
 size_flags_horizontal = 3
@@ -146,7 +155,10 @@ items = [ "Item 0", null, false ]
 select_mode = 1
 auto_height = true
 
-[node name="BindItems" type="Node" parent="HBoxContainer/VBoxContainer2/ItemList"]
+[node name="BindItems" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ItemList"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
 script = ExtResource( 5 )
 array_bind = "model.array"
 item_text = "text"
@@ -155,37 +167,58 @@ item_selected = "pressed"
 script = ExtResource( 5 )
 script = ExtResource( 5 )
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/VBoxContainer2"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer2"]
 margin_top = 31.0
 margin_right = 510.0
-margin_bottom = 600.0
+margin_bottom = 582.0
 size_flags_vertical = 3
 
-[node name="VBCRepeat" type="VBoxContainer" parent="HBoxContainer/VBoxContainer2/ScrollContainer"]
+[node name="VBCRepeat" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer"]
 margin_right = 510.0
-margin_bottom = 569.0
+margin_bottom = 551.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="RepeatPanel" parent="HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat" instance=ExtResource( 4 )]
+[node name="RepeatPanel" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat" instance=ExtResource( 4 )]
 anchor_left = 0.0
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_left = 0.0
 margin_right = 510.0
-margin_bottom = 569.0
+margin_bottom = 551.0
 rect_min_size = Vector2( 0, 145 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_styles/panel = SubResource( 1 )
 
-[node name="BindRepeat" type="Node" parent="HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatPanel"]
+[node name="BindRepeat" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatPanel"]
 script = ExtResource( 3 )
 array_bind = "model.array"
 target_property = "model"
 
-[connection signal="pressed" from="HBoxContainer/VBoxContainer/HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
-[connection signal="remove" from="HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatPanel" to="." method="_on_RepeatPanel_remove"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 586.0
+margin_right = 1024.0
+margin_bottom = 600.0
+
+[node name="TimerLabel" type="Label" parent="VBoxContainer/HBoxContainer2"]
+margin_bottom = 14.0
+
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer2/TimerLabel"]
+_import_path = ""
+physics_interpolation_mode = ""
+unique_name_in_owner = ""
+script = ExtResource( 1 )
+text = "model.time"
+script = ExtResource( 1 )
+
+[node name="Timer" type="Timer" parent="VBoxContainer/HBoxContainer2"]
+wait_time = 10.0
+autostart = true
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
+[connection signal="remove" from="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatPanel" to="." method="_on_RepeatPanel_remove"]
+[connection signal="timeout" from="VBoxContainer/HBoxContainer2/Timer" to="." method="_on_Timer_timeout"]
