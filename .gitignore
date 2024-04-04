@@ -1,4 +1,4 @@
-/.import
+/.godot
 addons/*
 !addons/DataBindControls
 .py_venv

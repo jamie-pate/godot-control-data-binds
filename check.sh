@@ -59,22 +59,22 @@ cd $dir
 
 set +e
 
+function activate_venv {
+	if [[ -d "$dir/.py_venv/bin" ]]; then
+		source "$dir/.py_venv/bin/activate"
+	else
+		source "$dir/.py_venv/Scripts/activate"
+	fi
+}
+
 if ! [[ -d "$dir/.py_venv" ]]; then
 	# install gdtoolkit in a venv
 	PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring python -m pip install 'virtualenv' --user
 	python -m virtualenv .py_venv
-	if [[ -d "$dir/.py_venv/bin" ]]; then
-		source "$dir/.py_venv/bin/activate"
-	else
-		source "$dir/.py_venv/Scripts/activate"
-	fi
-	PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring python -m pip install 'gdtoolkit==3.*'
+	activate_venv
+	PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring python -m pip install 'gdtoolkit==4.*'
 else
-	if [[ -d "$dir/.py_venv/bin" ]]; then
-		source "$dir/.py_venv/bin/activate"
-	else
-		source "$dir/.py_venv/Scripts/activate"
-	fi
+	activate_venv
 fi
 
 python --version

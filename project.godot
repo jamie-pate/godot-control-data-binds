@@ -6,34 +6,13 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
-
-_global_script_classes=[ {
-"base": "Binds",
-"class": "BindItems",
-"language": "GDScript",
-"path": "res://addons/DataBindControls/BindItems.gd"
-}, {
-"base": "Node",
-"class": "BindRepeat",
-"language": "GDScript",
-"path": "res://addons/DataBindControls/BindRepeat.gd"
-}, {
-"base": "Node",
-"class": "Binds",
-"language": "GDScript",
-"path": "res://addons/DataBindControls/Binds.gd"
-} ]
-_global_script_class_icons={
-"BindItems": "res://addons/DataBindControls/icons/list.svg",
-"BindRepeat": "res://addons/DataBindControls/icons/links.svg",
-"Binds": "res://addons/DataBindControls/icons/link.svg"
-}
+config_version=5
 
 [application]
 
 config/name="DataBinds"
-run/main_scene="res://Control.tscn"
+run/main_scene="res://Main.tscn"
+config/features=PackedStringArray("4.2")
 config/icon="res://icon.png"
 
 [autoload]
@@ -42,7 +21,7 @@ DataBindings="*res://addons/DataBindControls/DataBindingsGlobal.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/DataBindControls/plugin.cfg" )
+enabled=PackedStringArray("res://addons/DataBindControls/plugin.cfg", "res://addons/gut/plugin.cfg")
 
 [physics]
 
@@ -50,4 +29,4 @@ common/enable_pause_aware_picking=true
 
 [rendering]
 
-environment/default_environment="res://default_env.tres"
+environment/defaults/default_environment="res://default_env.tres"

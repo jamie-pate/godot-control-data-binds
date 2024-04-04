@@ -3,7 +3,9 @@ extends "./BaseModel.gd"
 
 var text: String
 var pressed: bool
-var icon: Texture
+var icon: Texture2D
 
-func _init(initial_value = {}).(initial_value):
+
+func _init(initial_value = {}):
+	super(initial_value)
 	pass

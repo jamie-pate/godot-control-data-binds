@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://dtu0iv2dbkinx"]
+
+[ext_resource type="Script" path="res://tests/RepeatedControlHost.gd" id="1_say2d"]
+[ext_resource type="Script" path="res://addons/DataBindControls/BindRepeat.gd" id="3_w8au5"]
+
+[node name="RepeatedControlHost" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_say2d")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="BindRepeat" type="Node" parent="Label"]
+script = ExtResource("3_w8au5")
+array_bind = "model"
+target_property = "text"
+
+[connection signal="gui_input" from="Label" to="." method="_on_label_gui_input"]

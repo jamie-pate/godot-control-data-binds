@@ -1,4 +1,4 @@
-tool
+@tool
 extends EditorPlugin
 
 const InspectorPlugin := preload("./InspectorPlugin.gd")
@@ -12,7 +12,7 @@ func _enter_tree():
 	inspector = InspectorPlugin.new()
 	add_inspector_plugin(inspector)
 	var path = get_script().resource_path.get_base_dir()
-	add_autoload_singleton("DataBindings", "%s/DataBindingsGlobal.gd" % [ path ])
+	add_autoload_singleton("DataBindings", "%s/DataBindingsGlobal.gd" % [path])
 
 
 func _exit_tree():
@@ -29,7 +29,7 @@ func handles(_object: Object) -> bool:
 	return false
 
 
-func make_visible(_show: bool) -> void:
+func _make_visible(_show: bool) -> void:
 	pass
 
 

@@ -1,16 +1,24 @@
-tool
-class_name BindItems, "./icons/list.svg"
+@tool
+@icon("./icons/list.svg")
+class_name BindItems
 extends Binds
 
 ## Bind items in an array to items in an ItemList, PopupMenu, OptionButton etc
 
-export var array_bind: String setget _set_array_bind
-export var item_text: String setget _set_item_text
-export var item_icon: String setget _set_item_icon
-export var item_disabled: String setget _set_item_disabled
-export var item_selectable: String setget _set_item_selectable
-export var item_tooltip: String setget _set_item_tooltip
-export var item_selected: String setget _set_item_selected
+@export var array_bind: String:
+	set = _set_array_bind
+@export var item_text: String:
+	set = _set_item_text
+@export var item_icon: String:
+	set = _set_item_icon
+@export var item_disabled: String:
+	set = _set_item_disabled
+@export var item_selectable: String:
+	set = _set_item_selectable
+@export var item_tooltip: String:
+	set = _set_item_tooltip
+@export var item_selected: String:
+	set = _set_item_selected
 
 
 func _get_property_list():
@@ -20,42 +28,42 @@ func _get_property_list():
 
 func _set_array_bind(value: String) -> void:
 	# need to call _bind_items() if we modify the binding at runtime
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	array_bind = value
 
 
 func _set_item_text(value: String) -> void:
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	item_text = value
 
 
 func _set_item_icon(value: String) -> void:
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	item_icon = value
 
 
 func _set_item_disabled(value: String) -> void:
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	item_disabled = value
 
 
 func _set_item_selectable(value: String) -> void:
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	item_selectable = value
 
 
 func _set_item_tooltip(value: String) -> void:
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	item_tooltip = value
 
 
 func _set_item_selected(value: String) -> void:
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	item_selected = value
 
 
 func _ready() -> void:
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 	var value = _get_value()
 	if value:
@@ -84,15 +92,15 @@ func detect_changes(new_value := []) -> bool:
 	# Todo: track items so we don't have to assign the entire array
 	var change_detected = false
 	for i in range(size):
-		change_detected = change_detected || _assign_item(p, i, new_value[i])
+		change_detected = _assign_item(p, i, new_value[i]) || change_detected
 	return change_detected
 
 
-func _on_parent_item_selected(idx: int) -> void:
+func _on_parent_item_selected(_idx: int) -> void:
 	var bt = BindTarget.new(array_bind, owner)
 	var array_model = bt.get_value() if bt else null
 	var parent = get_parent()
-	var selected = PoolByteArray()
+	var selected = PackedByteArray()
 	selected.resize(parent.get_item_count())
 	for i in parent.get_selected_items():
 		selected[i] = 1
@@ -104,7 +112,7 @@ func _on_parent_item_selected(idx: int) -> void:
 				model[item_selected] = value
 
 
-func _on_parent_multi_selected(idx: int, selected: bool) -> void:
+func _on_parent_multi_selected(idx: int, _selected: bool) -> void:
 	_on_parent_item_selected(idx)
 
 
@@ -135,7 +143,7 @@ func _assign_item(parent: Node, i: int, item) -> bool:
 							# singleselect = false
 							parent.select(i, false)
 						else:
-							parent.unselect(i)
+							parent.deselect(i)
 					else:
 						parent.call(set_method_name, i, new_value)
 	return change_detected
@@ -151,14 +159,13 @@ func _exit_tree():
 
 func _bind_parent():
 	var parent = get_parent()
-	var err = parent.connect("multi_selected", self, "_on_parent_multi_selected")
+	var err = parent.connect("multi_selected", Callable(self, "_on_parent_multi_selected"))
 	assert(err == OK)
-	err = parent.connect("item_selected", self, "_on_parent_item_selected")
+	err = parent.connect("item_selected", Callable(self, "_on_parent_item_selected"))
 	assert(err == OK)
 
 
 func _unbind_parent():
 	var parent = get_parent()
-	parent.disconnect("multi_selected", self, "_on_parent_multi_selected")
-	parent.disconnect("item_selected", self, "_on_parent_item_selected")
-
+	parent.disconnect("multi_selected", Callable(self, "_on_parent_multi_selected"))
+	parent.disconnect("item_selected", Callable(self, "_on_parent_item_selected"))

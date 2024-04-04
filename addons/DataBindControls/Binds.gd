@@ -1,5 +1,6 @@
-tool
-class_name Binds, "./icons/link.svg"
+@tool
+@icon("./icons/link.svg")
+class_name Binds
 extends Node
 
 ## Bind properties against a single control
@@ -8,14 +9,11 @@ const BindTarget := preload("./BindTarget.gd")
 const Util := preload("./Util.gd")
 
 const PASSTHROUGH_PROPS := [
-	"editor_description", "pause_mode", "process_priority", "script", "import_path"
+	"editor_description", "process_mode", "process_priority", "script", "import_path"
 ]
 
 const SIGNAL_PROPS := {
-	visible = "visibility_changed",
-	rect_size = "resized",
-	pressed = "pressed",
-	text = "text_changed"
+	visible = "visibility_changed", size = "resized", pressed = "pressed", text = "text_changed"
 }
 
 var _binds := {}
@@ -57,7 +55,7 @@ func _binds_get_property_list():
 
 func _set(prop_name, value):
 	# if this happens at runtime we need to _bind_targets() and _unbind_targets()
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	if prop_name in PASSTHROUGH_PROPS:
 		var method_name = ("set%s" if prop_name.begins_with("_") else "set_%s") % prop_name
 		if has_method(method_name):
@@ -78,7 +76,7 @@ func _get(prop_name):
 
 
 func _enter_tree():
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 	_bind_targets()
 
@@ -104,12 +102,12 @@ func _bind_target(p: String, parent: Node) -> void:
 		var sig = SIGNAL_PROPS[p]
 		if sig in sig_map:
 			var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
-			var err = parent.connect(SIGNAL_PROPS[p], self, method, [p])
+			var err = parent.connect(SIGNAL_PROPS[p], Callable(self, method).bind(p))
 			assert(err == OK)
 
 
 func _exit_tree():
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 	_unbind_targets()
 
@@ -131,7 +129,7 @@ func _unbind_target(p: String, parent: Node):
 		var sig = SIGNAL_PROPS[p]
 		if sig in sig_map:
 			var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
-			parent.disconnect(SIGNAL_PROPS[p], self, method)
+			parent.disconnect(SIGNAL_PROPS[p], Callable(self, method))
 
 
 func _on_parent_prop_changed0(prop_name: String):
@@ -162,10 +160,10 @@ func detect_changes() -> bool:
 				if typeof(parent[p]) != typeof(value) || parent[p] != value:
 					changes_detected = true
 					var cp
-					if "caret_position" in parent:
-						cp = parent.caret_position
+					if "caret_column" in parent:
+						cp = parent.caret_column
 					parent[p] = value
-					if "caret_position" in parent:
-						parent.caret_position = cp
+					if "caret_column" in parent:
+						parent.caret_column = cp
 
 	return changes_detected

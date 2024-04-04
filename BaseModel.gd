@@ -1,6 +1,6 @@
 ## A base model that facilitates an automatic init to make it easy to call `.new()`
 ## You can use any classes you like or even a dictionary if you are lazy.
-extends Reference
+extends RefCounted
 
 var _keys := []
 

@@ -1,6 +1,7 @@
 class-definitions-order:
 - tools
 - classnames
+# class definitions? (not supported so they count as 'others')
 - extends
 - signals
 - enums
@@ -31,15 +32,14 @@ function-variable-name: '[a-z][a-z0-9]*(_[a-z0-9]+)*'
 load-constant-name: (([A-Z][a-z0-9]*)+|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*)
 loop-variable-name: _?[a-z][a-z0-9]*(_[a-z0-9]+)*
 max-file-lines: 1000
-max-line-length: 100
+# gdformat enforces max-line-length differently
+max-line-length: 9000
 max-public-methods: 20
-mixed-tabs-and-spaces: null
-no-elif-return: null
-no-else-return: null
-private-method-call: null
+mixed-tabs-and-spaces: true
+private-method-call: true
 signal-name: '[a-z][a-z0-9]*(_[a-z0-9]+)*'
 sub-class-name: _?([A-Z][a-z0-9]*)+
 tab-characters: 1
-trailing-whitespace: null
-unnecessary-pass: null
+trailing-whitespace: true
+unnecessary-pass: true
 unused-argument: null

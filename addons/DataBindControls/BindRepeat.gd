@@ -1,5 +1,6 @@
-tool
-class_name BindRepeat, "./icons/links.svg"
+@tool
+@icon("./icons/links.svg")
+class_name BindRepeat
 extends Node
 
 ## Bind items in an array to be repeated using the parent template.
@@ -8,8 +9,10 @@ extends Node
 const Util := preload("./Util.gd")
 const BindTarget := preload("./BindTarget.gd")
 
-export var array_bind: String setget _set_array_bind
-export var target_property: String setget _set_target_property
+@export var array_bind: String:
+	set = _set_array_bind
+@export var target_property: String:
+	set = _set_target_property
 
 var _template: Control = null
 var _template_connections := []
@@ -21,7 +24,7 @@ func _init():
 
 
 func _ready():
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 	call_deferred("_deferred_ready")
 
@@ -31,10 +34,16 @@ func _deferred_ready():
 	var sigs_handled = {}
 	for sig in _template.get_signal_list():
 		for sc in _template.get_signal_connection_list(sig.name):
-			if sc.target == _template.owner && sc.flags & CONNECT_PERSIST:
-				sc.erase("source")
-				sc.erase("target")
+			var c = sc.callable as Callable
+			if c.get_object() == _template.owner && sc.flags & CONNECT_PERSIST:
+				
+				sc.signal_name = sc.signal.get_name()
+				sc.method = c.get_method()
+				sc.binds = c.get_bound_arguments()
 				_template_connections.append(sc)
+				# try to erase any possible node/object references
+				sc.erase("callable")
+				sc.erase("signal")
 
 	# we have to finish the _ready() callback _before_ we can do any of this
 	var tparent = _template.get_parent()
@@ -42,7 +51,7 @@ func _deferred_ready():
 	# _enter_tree() will use this value to reset the owner
 	_owner = owner
 	_template.remove_child(self)
-	tparent.add_child_below_node(_template, self)
+	tparent.add_child(self, false, Node.INTERNAL_MODE_BACK)
 	tparent.remove_child(_template)
 	var value = _get_value(true)
 	if value != null:
@@ -57,12 +66,12 @@ func _get_value(silent := false):
 
 
 func _set_array_bind(value: String) -> void:
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	array_bind = value
 
 
 func _set_target_property(value: String) -> void:
-	assert(Engine.editor_hint || !is_inside_tree())
+	assert(Engine.is_editor_hint() || !is_inside_tree())
 	target_property = value
 
 
@@ -77,21 +86,22 @@ func detect_changes(new_value: Array = []) -> bool:
 	var size = len(new_value)
 	# the repeat node should always be last, and every other node should be
 	# a repeated template instance
-	var change_detected = size != p.get_child_count() - 1
-	while size > p.get_child_count() - 1:
-		var instance = _template.duplicate(DUPLICATE_USE_INSTANCING)
+	var change_detected = size != p.get_child_count()
+	while size > p.get_child_count():
+		var instance = _template.duplicate(DUPLICATE_USE_INSTANTIATION)
 		p.add_child(instance)
 		for sc in _template_connections:
-			var err = instance.connect(sc.signal, owner, sc.method, sc.binds, sc.flags)
+			var err = instance.connect(
+				sc.signal_name, Callable(owner, sc.method).bind(sc.binds), sc.flags
+			)
 			assert(err == OK)
-	raise()
-	while size < p.get_child_count() - 1:
-		var c := p.get_child(p.get_child_count() - 2)
+	while size < p.get_child_count():
+		var c := p.get_child(p.get_child_count() - 1)
 		assert(c is Control && c != self)
 		p.remove_child(c)
 		c.queue_free()
 	for i in range(size):
-		change_detected = change_detected || _assign_item(p.get_child(i), new_value[i])
+		change_detected = _assign_item(p.get_child(i), new_value[i]) || change_detected
 	return change_detected
 
 
@@ -110,7 +120,7 @@ func _notification(what):
 
 
 func _enter_tree():
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 	if !owner && _owner:
 		owner = _owner

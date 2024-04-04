@@ -1,4 +1,3 @@
-tool
 extends Panel
 
 signal remove(model)
@@ -8,8 +7,9 @@ const BaseModel = preload("./BaseModel.gd")
 const RootModel = preload("./RootModel.gd")
 const ItemModel = preload("./ItemModel.gd")
 
-var model = RootModel.new({text = "root1", pressed = false, array = [], time = "0", path = ""}) setget _set_model
-var model_yaml := {value=""}
+var model = RootModel.new({text = "root1", pressed = false, array = [], time = "0", path = ""}):
+	set = _set_model
+var model_yaml := {value = ""}
 
 var _next_id = 0
 
@@ -20,12 +20,13 @@ func _ready():
 	a.append(ItemModel.new({text = "repeat0", pressed = false, icon = _get_icon(0)}))
 	a.append(ItemModel.new({text = "repeat1", pressed = true, icon = _get_icon(1)}))
 	_next_id = 2
-	print("model.array[0] = %s : %s" % [ get_path(), a[0] ])
+	print("model.array[0] = %s : %s" % [get_path(), a[0]])
 
 
 func _set_model(value):
 	model = value
 	assert(model, "Model can't be null, invalid type assignment?")
+
 
 func _get_icon(i: int):
 	var icons = [
@@ -37,7 +38,7 @@ func _get_icon(i: int):
 
 
 func _yaml(model, indent := "", indent_first := false) -> String:
-	var result := PoolStringArray()
+	var result := PackedStringArray()
 	if model is BaseModel:
 		var first = true
 		for k in model.keys():
@@ -59,7 +60,7 @@ func _yaml(model, indent := "", indent_first := false) -> String:
 			result.append("%s- %s" % [indent, _yaml(item, indent + "  ", false)])
 	else:
 		return "%s%s" % [indent if indent_first else "", model]
-	return result.join("\n")
+	return "\n".join(result)
 
 
 func _on_Button_pressed():
@@ -82,7 +83,7 @@ func _on_Timer_timeout():
 	## Ideally we would be able to hook into some of these at the engine level
 	## to automatically call detect_changes whenever a timeout or other async
 	## action happens similar to NgZone
-	model.time = str(OS.get_ticks_msec())
+	model.time = str(Time.get_ticks_msec())
 	DataBindings.detect_changes()
 
 

@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 
 var full_path: String
 var root
@@ -17,7 +17,12 @@ func _init(_path: String, _root, silent := false):
 			t = t[p]
 		else:
 			if !silent:
-				printerr("Unable to find bind %s on %s" % [full_path, root.get_path() if root is Node else root])
+				printerr(
+					(
+						"Unable to find bind %s on %s"
+						% [full_path, root.get_path() if root is Node else root]
+					)
+				)
 			break
 	if len(path) == 1:
 		prop = path[0]

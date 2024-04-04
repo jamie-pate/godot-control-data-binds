@@ -12,13 +12,30 @@ mechanism. Any place that may update data that needs to be reflected in the ui s
 
 ## Using Bind and Repeat
 
-The `Binds` node will automatically mirror the property names of it's parent `Control` node. The user can set the properties of the `Binds` node to bind data to a `Model` instance contained in a property the `owner` (scene root).
+The `Binds` node will automatically mirror the property names of it's parent `Control` node.
+The user can set the properties of the `Binds` node to bind data to a `Model` instance contained in a
+property the `owner` (scene root).
 
-The `Repeat` node should be added as a child of an _Instanced Child Scene_ and allows that scene to be used as a template which will be repeated for each item in it's bound `ArrayModel`. Set the `array_bind` and `target_property` properties on the `Repeat` node to bind to an `ArrayModel`.
+The `BindRepeat` node should be added as a child of an _Instanced Child Scene_ and allows that scene
+to be used as a template which will be repeated for each item in it's bound `ArrayModel`.
+Set the `array_bind` and `target_property` properties on the `Repeat` node to bind to an `ArrayModel`.
+
+* `array_bind`: Path to a property on the `owner` that contains the array items.
+	Each item will create an instance of the `parent`.
+* `target_property`: Property name in the `parent` that should be set to contain the value for each instance.
 
 ## Binding to ItemList etc
 
-The `BindItems` node can be added as a child of a `ItemList`, `PopupMenu` or `OptionButton` node to bind to their item list. the `item_selected` bind will sync the selected status of each item to the model in both directions. Set the `array_bind` property to the model path for the `ArrayModel` which contains your item data.
+The `BindItems` node can be added as a child of a `ItemList`, `PopupMenu` or `OptionButton` node to bind to their item list.
+The `item_selected` bind will sync the selected status of each item to the model in both directions, etc.
+Set the `array_bind` property to the model path for an array of objects. Each object is added as an item using the item bind.
+
+* `array_bind`: Path to a property on the `owner` that contains the array items.
+	Each item will create an item in the `parent`
+* `Item text`/`item_text`: A property on the array item that should be used for the item's text
+* `Item Icon`/`item_icon`: A property on the array item that should be used for the item's icon
+* `Item Selected`, `Item Disabled`, `Item Selectable`, `Item Tooltip` (etc): Set the name of a property to read from
+	each array item to be bound to that aspect of the item in the list
 
 ## Development
 

@@ -7,12 +7,14 @@ const MAX_CHANGES_LOGGED = 20
 
 var _change_detection_queued := false
 
+
 ## queue change detection
 func detect_changes() -> void:
 	if _change_detection_queued:
 		return
 	_change_detection_queued = true
 	call_deferred("_detect_changes")
+
 
 func _detect_changes():
 	# TODO: queue change detection per viewport root or control root?
@@ -26,9 +28,12 @@ func _detect_changes():
 	while changes_detected || _change_detection_queued:
 		changes_detected = false
 		if i > MAX_CHANGES:
-			printerr("Maximum changes detected.. change log:\n%s" % [
-				PoolStringArray(change_log).join("\n")
-			])
+			printerr(
+				(
+					"Maximum changes detected.. change log:\n%s"
+					% ["\n".join(PackedStringArray(change_log))]
+				)
+			)
 			result = true
 			break
 		var binds := get_tree().get_nodes_in_group(Util.BIND_GROUP)
