@@ -33,24 +33,68 @@ func _binds_get_property_list():
 	if !parent:
 		return []
 	var pl := parent.get_property_list().duplicate(true)
+	var properties := []
+	var default_category := {
+		"name": "↔ Binds", "class_name": &"", "type": 4, "usage": 128, "hint_text": "BoundPropertyReadonly"
+	}
+	var default_readonly_cat = default_category.duplicate()
+	default_readonly_cat.name = "→ Binds"
+	var readonly_props := [default_readonly_cat]
+	var readwrite_props := [default_category]
+	var readwrite_priority_props := [default_readonly_cat]
+	var readonly_priority_props := [default_category]
+	var group_or_cat_usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SUBGROUP
+	var cat_name := ''
 	for p in pl:
-		if p.name in PASSTHROUGH_PROPS:
+		if p.usage & PROPERTY_USAGE_CHECKABLE:
 			continue
-		# for some reason there's a property item with no name?
-		# also only can provide bindings for properties that have a _changed signal
-		if !p.name:
-			pl.erase(p)
+		if p.usage & PROPERTY_USAGE_CATEGORY:
+			cat_name = p.name
+		var skip = p.name in PASSTHROUGH_PROPS || cat_name == 'Node'
+		if skip:
+			p.usage = p.usage & ~PROPERTY_USAGE_STORAGE
+		if skip || p.usage & group_or_cat_usage:
+			properties.append(p)
+		if skip:
+			continue
+		var readonly = true
 		p.hint_text = "BoundPropertyReadonly"
 		if p.name in SIGNAL_PROPS:
 			if parent.has_signal(SIGNAL_PROPS[p.name]):
+				readonly = false
 				p.hint_text = "BoundProperty"
+		p.usage = p.usage & (PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_EDITOR | group_or_cat_usage)
 		if !_binds.get(p.name):
 			# don't store bindings that are empty
 			p.usage = p.usage & ~PROPERTY_USAGE_STORAGE
 		p.erase("hint")
 		p.erase("hint_string")
 		p.type = TYPE_STRING
-	return pl
+		if p.usage & group_or_cat_usage:
+			p = p.duplicate()
+			var name = p.name
+			p.name = "↔ %s Binds" % [name]
+			for list in [readwrite_priority_props, readwrite_props]:
+				list.append(p)
+			p = p.duplicate()
+			p.name = "→ %s Binds" % [name]
+			for list in [readonly_priority_props, readwrite_props]:
+				list.append(p)
+		else:
+			var dest := []
+			var priority := cat_name == parent.get_class()
+			if readonly:
+				dest = readonly_priority_props if priority else readonly_props
+			else:
+				dest = readwrite_priority_props if priority else readwrite_props
+			dest.append(p)
+	var result := []
+	result.append_array(readwrite_priority_props)
+	result.append_array(readonly_priority_props)
+	result.append_array(readwrite_props)
+	result.append_array(readonly_props)
+	result.append_array(properties)
+	return result
 
 
 func _set(prop_name, value):

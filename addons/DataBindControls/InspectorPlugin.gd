@@ -11,7 +11,7 @@ func can_handle(object: Object):
 func parse_property(
 	_object: Object, type: int, path: String, _hint: int, hint_text: String, _usage: int
 ) -> bool:
-	if type == TYPE_STRING and hint_text == "BoundProperty":
+	if type == TYPE_STRING && hint_text in ["BoundProperty", "BoundPropertyReadonly"]:
 		print("parse_property %s %s %s" % [type, path, hint_text])
 		add_property_editor(path, BindEditor.new())
 		return true
