@@ -2,3 +2,4 @@
 addons/*
 !addons/DataBindControls
 .py_venv
+.DS_STORE

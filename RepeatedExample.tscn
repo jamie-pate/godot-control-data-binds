@@ -37,7 +37,6 @@ process_physics_priority = ""
 process_thread_group = ""
 script = ExtResource("2")
 texture = "model.icon"
-script = ExtResource("2")
 
 [node name="Button" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -53,7 +52,6 @@ process_physics_priority = ""
 process_thread_group = ""
 script = ExtResource("2")
 text = "model.text"
-script = ExtResource("2")
 
 [node name="CheckBox" type="CheckBox" parent="VBoxContainer"]
 layout_mode = 2
@@ -65,7 +63,6 @@ process_physics_priority = ""
 process_thread_group = ""
 script = ExtResource("2")
 button_pressed = "model.pressed"
-script = ExtResource("2")
 
 [node name="CheckButton" type="CheckButton" parent="VBoxContainer"]
 layout_mode = 2
@@ -77,7 +74,6 @@ process_physics_priority = ""
 process_thread_group = ""
 script = ExtResource("2")
 button_pressed = "model.pressed"
-script = ExtResource("2")
 
 [node name="TextEdit3" type="TextEdit" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 38)
@@ -90,7 +86,6 @@ process_physics_priority = ""
 process_thread_group = ""
 script = ExtResource("2")
 text = "model.text"
-script = ExtResource("2")
 
 [node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
 layout_mode = 2
@@ -102,7 +97,6 @@ process_physics_priority = ""
 process_thread_group = ""
 script = ExtResource("2")
 text = "model.text"
-script = ExtResource("2")
 
 [node name="TextEdit" type="TextEdit" parent="VBoxContainer"]
 layout_mode = 2
