@@ -21,7 +21,7 @@ DataBindings="*res://addons/DataBindControls/DataBindingsGlobal.gd"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/DataBindControls/plugin.cfg", "res://addons/gut/plugin.cfg")
+enabled=PackedStringArray("res://addons/DataBindControls/plugin.cfg")
 
 [physics]
 

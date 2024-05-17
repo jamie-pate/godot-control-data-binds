@@ -4,9 +4,11 @@ var full_path: String
 var root
 var target = null
 var prop := ""
+var callable_str := ""
 
 
-func _init(_path: String, _root, silent := false):
+func _init(_path: String, _root, silent := false, c := ""):
+	callable_str = c
 	full_path = _path
 	root = _root
 	var path := Array(_path.split("."))
@@ -31,6 +33,9 @@ func _init(_path: String, _root, silent := false):
 
 func get_value():
 	assert(target)
+	if callable_str:
+		var callable = Callable(root, callable_str)
+		return callable.call()
 	return target.get(prop)
 
 

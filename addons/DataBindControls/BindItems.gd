@@ -70,8 +70,13 @@ func _ready() -> void:
 		detect_changes(value)
 
 
-func _get_value():
+func _get_value(silent := false):
 	var bt = BindTarget.new(array_bind, owner)
+	var path := Array(array_bind.split("."))
+	var last_elem: String = path[len(path) - 1]
+	var callable_present = last_elem.ends_with("()")
+	if callable_present:
+		bt = BindTarget.new(array_bind.replace("." + last_elem, ""),owner,silent,last_elem.replace("()", "") if callable_present else "")
 	return bt.get_value()
 
 

@@ -36,7 +36,6 @@ func _deferred_ready():
 		for sc in _template.get_signal_connection_list(sig.name):
 			var c = sc.callable as Callable
 			if c.get_object() == _template.owner && sc.flags & CONNECT_PERSIST:
-				
 				sc.signal_name = sc.signal.get_name()
 				sc.method = c.get_method()
 				sc.binds = c.get_bound_arguments()
@@ -61,6 +60,17 @@ func _deferred_ready():
 func _get_value(silent := false):
 	if array_bind && target_property:
 		var bt = BindTarget.new(array_bind, owner, silent)
+		var path := Array(array_bind.split("."))
+		var last_elem: String = path[len(path) - 1]
+		var callable_present = last_elem.ends_with("()")
+
+		if callable_present:
+			bt = BindTarget.new(
+				array_bind.replace("." + last_elem, ""),
+				owner,
+				silent,
+				last_elem.replace("()", "") if callable_present else ""
+			)
 		return bt.get_value() if bt.target else null
 	return null
 

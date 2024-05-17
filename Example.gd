@@ -14,11 +14,18 @@ var model_yaml := {value = ""}
 var _next_id = 0
 
 
+# Sample callable that returns only item models with an even value
+func sample_callable():
+	var sub_array = model.array.filter(func(n): return n.value % 2 == 0)
+	return sub_array
+
+
 func _ready():
 	var a := model.array as Array
 	model.path = str(get_path())
-	a.append(ItemModel.new({text = "repeat0", pressed = false, icon = _get_icon(0)}))
-	a.append(ItemModel.new({text = "repeat1", pressed = true, icon = _get_icon(1)}))
+	a.append(ItemModel.new({text = "repeat0", pressed = false, icon = _get_icon(0), value = 1}))
+	a.append(ItemModel.new({text = "repeat1", pressed = true, icon = _get_icon(1), value = 0}))
+	a.append(ItemModel.new({text = "repeat2", pressed = true, icon = _get_icon(1), value = 0}))
 	_next_id = 2
 	print("model.array[0] = %s : %s" % [get_path(), a[0]])
 

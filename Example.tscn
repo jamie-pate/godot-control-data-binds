@@ -151,7 +151,7 @@ theme_override_styles/panel = SubResource("1")
 
 [node name="BindRepeat" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatPanel"]
 script = ExtResource("3")
-array_bind = "model.array"
+array_bind = "model.array.sample_callable()"
 target_property = "model"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]

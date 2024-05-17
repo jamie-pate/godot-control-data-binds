@@ -35,7 +35,11 @@ func _binds_get_property_list():
 	var pl := parent.get_property_list().duplicate(true)
 	var properties := []
 	var default_category := {
-		"name": "↔ Binds", "class_name": &"", "type": 4, "usage": 128, "hint_text": "BoundPropertyReadonly"
+		"name": "↔ Binds",
+		"class_name": &"",
+		"type": 4,
+		"usage": 128,
+		"hint_text": "BoundPropertyReadonly"
 	}
 	var default_readonly_cat = default_category.duplicate()
 	default_readonly_cat.name = "→ Binds"
@@ -43,14 +47,16 @@ func _binds_get_property_list():
 	var readwrite_props := [default_category]
 	var readwrite_priority_props := [default_readonly_cat]
 	var readonly_priority_props := [default_category]
-	var group_or_cat_usage = PROPERTY_USAGE_GROUP | PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SUBGROUP
-	var cat_name := ''
+	var group_or_cat_usage = (
+		PROPERTY_USAGE_GROUP | PROPERTY_USAGE_CATEGORY | PROPERTY_USAGE_SUBGROUP
+	)
+	var cat_name := ""
 	for p in pl:
 		if p.usage & PROPERTY_USAGE_CHECKABLE:
 			continue
 		if p.usage & PROPERTY_USAGE_CATEGORY:
 			cat_name = p.name
-		var skip = p.name in PASSTHROUGH_PROPS || cat_name == 'Node'
+		var skip = p.name in PASSTHROUGH_PROPS || cat_name == "Node"
 		if skip:
 			p.usage = p.usage & ~PROPERTY_USAGE_STORAGE
 		if skip || p.usage & group_or_cat_usage:

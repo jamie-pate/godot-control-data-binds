@@ -4,6 +4,7 @@ extends "./BaseModel.gd"
 var text: String
 var pressed: bool
 var icon: Texture2D
+var value: int
 
 
 func _init(initial_value = {}):
