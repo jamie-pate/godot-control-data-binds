@@ -102,7 +102,7 @@ func detect_changes(new_value: Array = []) -> bool:
 		p.add_child(instance)
 		for sc in _template_connections:
 			var err = instance.connect(
-				sc.signal_name, Callable(owner, sc.method).bind(sc.binds), sc.flags
+				sc.signal_name, Callable(owner, sc.method).bindv(sc.binds), sc.flags
 			)
 			assert(err == OK)
 	while size < p.get_child_count():
