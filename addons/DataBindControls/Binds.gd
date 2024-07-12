@@ -7,13 +7,18 @@ extends Node
 
 const BindTarget := preload("./BindTarget.gd")
 const Util := preload("./Util.gd")
+const NUM_TYPES: Array[Variant.Type] = [TYPE_INT, TYPE_FLOAT]
 
 const PASSTHROUGH_PROPS := [
 	"editor_description", "process_mode", "process_priority", "script", "import_path"
 ]
 
 const SIGNAL_PROPS := {
-	visible = "visibility_changed", size = "resized", pressed = "pressed", text = "text_changed"
+	visible = "visibility_changed",
+	size = "resized",
+	button_pressed = "pressed",
+	text = "text_changed",
+	value = "value_changed"
 }
 
 var _binds := {}
@@ -207,7 +212,7 @@ func detect_changes() -> bool:
 			if bt.target:
 				var parent = get_parent()
 				var value = bt.get_value()
-				if typeof(parent[p]) != typeof(value) || parent[p] != value:
+				if !_comparable_types(parent[p], value) || parent[p] != value:
 					changes_detected = true
 					var cp
 					if "caret_column" in parent:
@@ -215,5 +220,10 @@ func detect_changes() -> bool:
 					parent[p] = value
 					if "caret_column" in parent:
 						parent.caret_column = cp
-
 	return changes_detected
+
+
+func _comparable_types(a, b):
+	var a_type := typeof(a)
+	var b_type := typeof(b)
+	return a == b || a in NUM_TYPES && b in NUM_TYPES

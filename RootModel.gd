@@ -10,4 +10,3 @@ var time: String
 
 func _init(initial_value = {}):
 	super(initial_value)
-	pass
