@@ -36,10 +36,10 @@ func get_value():
 	if callable_str:
 		var callable = Callable(root, callable_str)
 		return callable.call()
+	assert(prop in target, "%s not found in %s" % [prop, target])
 	return target.get(prop)
 
 
 func set_value(value):
 	assert(target)
-
 	target.set(prop, value)

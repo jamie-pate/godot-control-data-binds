@@ -22,6 +22,7 @@ const SIGNAL_PROPS := {
 }
 
 var _binds := {}
+var _detected_change_log := []
 
 
 func _init():
@@ -192,7 +193,10 @@ func _on_parent_prop_changed0(prop_name: String):
 
 
 func _on_parent_prop_changed1(value, prop_name: String):
-	value = get_parent()[prop_name]
+	var parent := get_parent()
+	if prop_name != "visible" && !parent.is_visible_in_tree():
+		return
+	value = parent[prop_name]
 	var path = _binds[prop_name]
 	if path:
 		var bt = BindTarget.new(path, owner)
@@ -202,6 +206,7 @@ func _on_parent_prop_changed1(value, prop_name: String):
 
 
 func detect_changes() -> bool:
+	_detected_change_log = []
 	var changes_detected = false
 	for p in _binds:
 		if p in PASSTHROUGH_PROPS:
@@ -211,19 +216,32 @@ func detect_changes() -> bool:
 			var bt = BindTarget.new(b, owner)
 			if bt.target:
 				var parent = get_parent()
-				var value = bt.get_value()
-				if !_comparable_types(parent[p], value) || parent[p] != value:
-					changes_detected = true
-					var cp
-					if "caret_column" in parent:
-						cp = parent.caret_column
-					parent[p] = value
-					if "caret_column" in parent:
-						parent.caret_column = cp
+				if parent.is_visible_in_tree() || p == "visible":
+					var value = bt.get_value()
+					if !_equal_approx(parent[p], value):
+						_detected_change_log.append(
+							"%s: %s != %s" % [bt.full_path, parent[p], value]
+						)
+						changes_detected = true
+						var cp
+						if "caret_column" in parent:
+							cp = parent.caret_column
+						parent[p] = value
+						if "caret_column" in parent:
+							parent.caret_column = cp
 	return changes_detected
 
 
-func _comparable_types(a, b):
+func _equal_approx(a, b):
 	var a_type := typeof(a)
 	var b_type := typeof(b)
-	return a == b || a in NUM_TYPES && b in NUM_TYPES
+	# only compare different types if they are both numbers
+	if a_type != b_type && !(a_type in NUM_TYPES && b_type in NUM_TYPES):
+		return false
+	if a_type == TYPE_FLOAT || b_type == TYPE_FLOAT:
+		return is_equal_approx(a, b)
+	return a == b
+
+
+func get_desc():
+	return "%s\n%s" % [get_path(), "\n".join(_detected_change_log)]

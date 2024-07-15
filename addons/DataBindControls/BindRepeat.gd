@@ -17,6 +17,7 @@ const BindTarget := preload("./BindTarget.gd")
 var _template: Control = null
 var _template_connections := []
 var _owner
+var _detected_change_log := []
 
 
 func _init():
@@ -86,6 +87,7 @@ func _set_target_property(value: String) -> void:
 
 
 func detect_changes(new_value: Array = []) -> bool:
+	_detected_change_log = []
 	# TODO: track moved items instead of reassigning every time
 	if !_template:
 		return false
@@ -111,14 +113,16 @@ func detect_changes(new_value: Array = []) -> bool:
 		p.remove_child(c)
 		c.queue_free()
 	for i in range(size):
-		change_detected = _assign_item(p.get_child(i), new_value[i]) || change_detected
+		change_detected = _assign_item(p.get_child(i), new_value[i], i) || change_detected
 	return change_detected
 
 
-func _assign_item(child, item):
+func _assign_item(child, item, i):
 	if array_bind && target_property in child:
 		var m = child[target_property]
-		if typeof(child[target_property]) != typeof(item) || child[target_property] != item:
+		var current_value = child[target_property]
+		if typeof(current_value) != typeof(item) || current_value != item:
+			_detected_change_log.append("[%s].%s: %s != %s" % [i, current_value, item])
 			child[target_property] = item
 
 
@@ -136,3 +140,7 @@ func _enter_tree():
 		owner = _owner
 		_owner = null
 		assert(owner)
+
+
+func get_desc():
+	return "%s: Repeat" % [get_path(), "\n".join(_detected_change_log)]

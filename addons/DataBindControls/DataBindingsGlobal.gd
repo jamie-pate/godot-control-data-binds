@@ -26,6 +26,7 @@ func _detect_changes():
 	var changes_detected := true
 	var result := false
 	while changes_detected || _change_detection_queued:
+		_change_detection_queued = false
 		changes_detected = false
 		if i > MAX_CHANGES:
 			printerr(
@@ -42,7 +43,7 @@ func _detect_changes():
 			if cd:
 				while len(change_log) > MAX_CHANGES_LOGGED:
 					change_log.pop_front()
-				change_log.append(bind.get_path())
+				change_log.append(bind.get_desc())
 			changes_detected = changes_detected || cd
 		i += 1
 		result = i > 1
