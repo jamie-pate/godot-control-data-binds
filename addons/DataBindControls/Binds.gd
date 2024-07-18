@@ -141,6 +141,8 @@ func _bind_targets():
 	var parent := get_parent()
 	for p in _binds:
 		_bind_target(p, parent)
+	if parent.has_signal("visibility_changed"):
+		parent.visibility_changed.connect(_on_parent_visibility_changed)
 
 
 func _bind_target(p: String, parent: Node) -> void:
@@ -174,6 +176,9 @@ func _unbind_targets():
 	for p in _binds:
 		_unbind_target(p, parent)
 
+	if parent.has_signal("visibility_changed"):
+		parent.visibility_changed.disconnect(_on_parent_visibility_changed)
+
 
 func _unbind_target(p: String, parent: Node):
 	if p in PASSTHROUGH_PROPS:
@@ -186,6 +191,11 @@ func _unbind_target(p: String, parent: Node):
 		if sig in sig_map:
 			var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
 			parent.disconnect(SIGNAL_PROPS[p], Callable(self, method))
+
+func _on_parent_visibility_changed():
+	# If visibility changes we need to redetect changes because
+	# changes are ignored when controls are hidden.
+	DataBindings.detect_changes()
 
 
 func _on_parent_prop_changed0(prop_name: String):
