@@ -122,7 +122,9 @@ func _assign_item(child, item, i):
 		var m = child[target_property]
 		var current_value = child[target_property]
 		if typeof(current_value) != typeof(item) || current_value != item:
-			_detected_change_log.append("[%s].%s: %s != %s" % [i, current_value, item])
+			_detected_change_log.append(
+				"[%s].%s: %s != %s" % [i, target_property, current_value, item]
+			)
 			child[target_property] = item
 
 
@@ -143,4 +145,4 @@ func _enter_tree():
 
 
 func get_desc():
-	return "%s: Repeat" % [get_path(), "\n".join(_detected_change_log)]
+	return "%s: Repeat\n%s" % [get_path(), "\n".join(_detected_change_log)]

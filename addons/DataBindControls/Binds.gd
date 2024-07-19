@@ -192,6 +192,7 @@ func _unbind_target(p: String, parent: Node):
 			var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
 			parent.disconnect(SIGNAL_PROPS[p], Callable(self, method))
 
+
 func _on_parent_visibility_changed():
 	# If visibility changes we need to redetect changes because
 	# changes are ignored when controls are hidden.

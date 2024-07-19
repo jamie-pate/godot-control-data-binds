@@ -148,7 +148,9 @@ func _assign_item(parent: Node, i: int, item) -> bool:
 					update = typeof(old_value) != typeof(new_value) || old_value != new_value
 					change_detected = change_detected || update
 					if update:
-						_detected_change_log.append("[%s].%s: %s != %s" % [i, old_value, new_value])
+						_detected_change_log.append(
+							"[%s].%s(): %s != %s" % [i, set_method_name, old_value, new_value]
+						)
 				if update:
 					if set_method_name == "select":
 						if new_value:
@@ -184,4 +186,4 @@ func _unbind_parent():
 
 
 func get_desc():
-	return "%s: Repeat" % [get_path(), "\n".join(_detected_change_log)]
+	return "%s: Items\n%s" % [get_path(), "\n".join(_detected_change_log)]
