@@ -70,6 +70,13 @@ func _ready() -> void:
 		detect_changes(value)
 
 
+func _get_target():
+	## target can be the parent, but if it's a MenuButton or something similar
+	## try the `get_popup()` method to get the 'real' target
+	var parent := get_parent()
+	return parent.get_popup() if parent.has_method('get_popup') else parent
+
+
 func _get_value(silent := false):
 	var bt = BindTarget.new(array_bind, owner)
 	var path := Array(array_bind.split("."))
@@ -90,43 +97,47 @@ func detect_changes(new_value := []) -> bool:
 		var v = _get_value()
 		new_value = v if v != null else []
 	var size = len(new_value)
-	var p = get_parent()
+	var t = _get_target()
 	# TODO: maybe just check for has_method(`get_item_*`)?
-	assert(p is ItemList || p is PopupMenu || p is OptionButton)
+	assert(t is ItemList || t is PopupMenu || t is OptionButton)
 
-	while size > p.get_item_count():
-		p.add_item("")
-	while size < p.get_item_count():
-		p.remove_item(p.get_item_count() - 1)
+	while size > t.get_item_count():
+		t.add_item("")
+	while size < t.get_item_count():
+		t.remove_item(t.get_item_count() - 1)
 
 	# Todo: track items so we don't have to assign the entire array
 	var change_detected = false
 	for i in range(size):
-		change_detected = _assign_item(p, i, new_value[i]) || change_detected
+		change_detected = _assign_item(t, i, new_value[i]) || change_detected
 	return change_detected
 
 
-func _on_parent_item_selected(_idx: int) -> void:
+func _on_item_selected(_idx: int) -> void:
 	var bt = BindTarget.new(array_bind, owner)
 	var array_model = bt.get_value() if bt else null
-	var parent = get_parent()
+	var target = _get_target()
 	var selected = PackedByteArray()
-	selected.resize(parent.get_item_count())
-	for i in parent.get_selected_items():
-		selected[i] = 1
+	selected.resize(target.get_item_count())
+	if target.has_method("get_selected_items"):
+		for i in target.get_selected_items():
+			selected[i] = 1
+	else:
+		for i in len(selected):
+			selected[i] = 1 if _idx == 1 else 0
 	if array_model && item_selected:
-		for i in range(parent.get_item_count()):
+		for i in range(target.get_item_count()):
 			var model = array_model[i]
 			var value = selected[i] == 1
 			if model[item_selected] != value:
 				model[item_selected] = value
 
 
-func _on_parent_multi_selected(idx: int, _selected: bool) -> void:
-	_on_parent_item_selected(idx)
+func _on_multi_selected(idx: int, _selected: bool) -> void:
+	_on_item_selected(idx)
 
 
-func _assign_item(parent: Node, i: int, item) -> bool:
+func _assign_item(target: Node, i: int, item) -> bool:
 	var change_detected := false
 	var pl = get_script().get_script_property_list()
 	for p in pl:
@@ -140,11 +151,11 @@ func _assign_item(parent: Node, i: int, item) -> bool:
 				get_method_name = "is_selected"
 
 			var model_prop = self[p.name]
-			if model_prop && parent.has_method(get_method_name) && model_prop in item:
+			if model_prop && target.has_method(get_method_name) && model_prop in item:
 				var new_value = item[model_prop]
 				var update := true
-				if parent.has_method(set_method_name):
-					var old_value = parent.call(get_method_name, i)
+				if target.has_method(set_method_name):
+					var old_value = target.call(get_method_name, i)
 					update = typeof(old_value) != typeof(new_value) || old_value != new_value
 					change_detected = change_detected || update
 					if update:
@@ -155,34 +166,44 @@ func _assign_item(parent: Node, i: int, item) -> bool:
 					if set_method_name == "select":
 						if new_value:
 							# singleselect = false
-							parent.select(i, false)
+							target.select(i, false)
 						else:
-							parent.deselect(i)
+							target.deselect(i)
 					else:
-						parent.call(set_method_name, i, new_value)
+						target.call(set_method_name, i, new_value)
 	return change_detected
 
 
 func _enter_tree():
-	_bind_parent()
+	_bind_item_control()
 
 
 func _exit_tree():
-	_unbind_parent()
+	_unbind_item_control()
 
 
-func _bind_parent():
-	var parent = get_parent()
-	var err = parent.connect("multi_selected", Callable(self, "_on_parent_multi_selected"))
-	assert(err == OK)
-	err = parent.connect("item_selected", Callable(self, "_on_parent_item_selected"))
-	assert(err == OK)
+func _bind_item_control():
+	var target = _get_target()
+	if target.has_signal("multi_selected"):
+		var err = target.multi_selected.connect(_on_multi_selected)
+		assert(err == OK)
+	if target.has_signal("item_selected"):
+		var err = target.item_selected.connect(_on_item_selected)
+		assert(err == OK)
+	elif target.has_signal("index_pressed"):
+		# PopupMenu
+		var err = target.index_pressed.connect(_on_item_selected)
+		assert(err == OK)
 
 
-func _unbind_parent():
-	var parent = get_parent()
-	parent.disconnect("multi_selected", Callable(self, "_on_parent_multi_selected"))
-	parent.disconnect("item_selected", Callable(self, "_on_parent_item_selected"))
+func _unbind_item_control():
+	var target = _get_target()
+	if target.has_signal("multi_selected"):
+		target.multi_selected.disconnect(_on_multi_selected)
+	if target.has_signal("item_selected"):
+		target.item_selected.disconnect(_on_item_selected)
+	elif target.has_signal("index_pressed"):
+		target.index_pressed.disconnect(_on_item_selected)
 
 
 func get_desc():
