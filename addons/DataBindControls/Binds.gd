@@ -18,7 +18,8 @@ const SIGNAL_PROPS := {
 	size = "resized",
 	button_pressed = "pressed",
 	text = "text_changed",
-	value = "value_changed"
+	value = "value_changed",
+	selected = "item_selected"
 }
 
 var _binds := {}
