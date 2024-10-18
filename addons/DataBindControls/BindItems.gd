@@ -74,21 +74,11 @@ func _get_target():
 	## target can be the parent, but if it's a MenuButton or something similar
 	## try the `get_popup()` method to get the 'real' target
 	var parent := get_parent()
-	return parent.get_popup() if parent.has_method('get_popup') else parent
+	return parent.get_popup() if parent.has_method("get_popup") else parent
 
 
 func _get_value(silent := false):
-	var bt = BindTarget.new(array_bind, owner)
-	var path := Array(array_bind.split("."))
-	var last_elem: String = path[len(path) - 1]
-	var callable_present = last_elem.ends_with("()")
-	if callable_present:
-		bt = BindTarget.new(
-			array_bind.replace("." + last_elem, ""),
-			owner,
-			silent,
-			last_elem.replace("()", "") if callable_present else ""
-		)
+	var bt = BindTarget.new(array_bind, owner, silent)
 	return bt.get_value()
 
 
@@ -150,9 +140,10 @@ func _assign_item(target: Node, i: int, item) -> bool:
 				set_method_name = "select"
 				get_method_name = "is_selected"
 
-			var model_prop = self[p.name]
-			if model_prop && target.has_method(get_method_name) && model_prop in item:
-				var new_value = item[model_prop]
+			var bind_expr = self[p.name]
+			var bt := BindTarget.new(bind_expr, item) if bind_expr else null
+			if bt && bt.target && target.has_method(get_method_name):
+				var new_value = bt.get_value()
 				var update := true
 				if target.has_method(set_method_name):
 					var old_value = target.call(get_method_name, i)

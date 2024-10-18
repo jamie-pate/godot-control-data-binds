@@ -7,8 +7,7 @@ var prop := ""
 var callable_str := ""
 
 
-func _init(_path: String, _root, silent := false, c := ""):
-	callable_str = c
+func _init(_path: String, _root, silent := false):
 	full_path = _path
 	root = _root
 	var path := Array(_path.split("."))
@@ -27,7 +26,10 @@ func _init(_path: String, _root, silent := false, c := ""):
 				)
 			break
 	if len(path) == 1:
-		prop = path[0]
+		if path[0].ends_with("()"):
+			callable_str = path[0].trim_suffix("()")
+		else:
+			prop = path[0]
 		target = t
 
 
@@ -36,10 +38,10 @@ func get_value():
 	if callable_str:
 		var callable = Callable(root, callable_str)
 		return callable.call()
-	assert(prop in target, "%s not found in %s" % [prop, target])
+	assert(prop in target, "%s not found in %s (%s)" % [prop, target, full_path])
 	return target.get(prop)
 
 
 func set_value(value):
-	assert(target)
+	assert(target && prop)
 	target.set(prop, value)
