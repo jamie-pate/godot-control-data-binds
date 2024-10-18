@@ -36,7 +36,7 @@ func _init(_path: String, _root, silent := false):
 func get_value():
 	assert(target)
 	if callable_str:
-		var callable = Callable(root, callable_str)
+		var callable = Callable(target, callable_str)
 		return callable.call()
 	assert(prop in target, "%s not found in %s (%s)" % [prop, target, full_path])
 	return target.get(prop)
