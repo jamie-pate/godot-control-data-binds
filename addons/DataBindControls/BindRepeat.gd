@@ -108,13 +108,17 @@ func detect_changes(new_value: Array = []) -> bool:
 
 func _assign_item(child, item, i):
 	if array_bind && target_property in child:
-		var m = child[target_property]
 		var current_value = child[target_property]
-		if typeof(current_value) != typeof(item) || current_value != item:
+		var new_hash := hash(var_to_str(item))
+		if (
+			!is_same(current_value, item)
+			|| child.get_meta(target_property + "_hash") != new_hash
+		):
 			_detected_change_log.append(
 				"[%s].%s: %s != %s" % [i, target_property, current_value, item]
 			)
 			child[target_property] = item
+			child.set_meta(target_property + "_hash", new_hash)
 
 
 func _notification(what):

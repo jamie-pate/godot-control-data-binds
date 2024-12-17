@@ -230,7 +230,11 @@ func detect_changes() -> bool:
 				var parent = get_parent()
 				if parent.is_visible_in_tree() || p == "visible":
 					var value = bt.get_value()
-					if !_equal_approx(parent[p], value):
+					var new_hash := hash(var_to_str(value))
+					if (
+						!_equal_approx(parent[p], value)
+						|| parent.get_meta(p + "_hash") != new_hash
+					):
 						_detected_change_log.append(
 							"%s: %s != %s" % [bt.full_path, parent[p], value]
 						)
@@ -239,6 +243,7 @@ func detect_changes() -> bool:
 						if "caret_column" in parent:
 							cp = parent.caret_column
 						parent[p] = value
+						parent.set_meta(p + "_hash", new_hash)
 						if "caret_column" in parent:
 							parent.caret_column = cp
 	return changes_detected
