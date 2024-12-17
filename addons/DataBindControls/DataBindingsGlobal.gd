@@ -9,14 +9,14 @@ var _change_detection_queued := false
 
 
 ## queue change detection
-func detect_changes() -> void:
+func detect_changes(ancestor: Node = null) -> void:
 	if _change_detection_queued:
 		return
 	_change_detection_queued = true
-	call_deferred("_detect_changes")
+	call_deferred("_detect_changes", ancestor)
 
 
-func _detect_changes():
+func _detect_changes(ancestor: Node):
 	# TODO: queue change detection per viewport root or control root?
 	# each piece of 2d UI change detection could happen on a separate frame, spreading out the load..
 	# 50 binds can take 1ms to check
@@ -38,6 +38,8 @@ func _detect_changes():
 			result = true
 			break
 		var binds := get_tree().get_nodes_in_group(Util.BIND_GROUP)
+		if ancestor:
+			binds = binds.filter(ancestor.is_ancestor_of)
 		for bind in binds:
 			var cd := bind.detect_changes() as bool
 			if cd:
