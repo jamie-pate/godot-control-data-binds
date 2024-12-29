@@ -5,8 +5,21 @@ extends Binds
 
 ## Bind items in an array to items in an ItemList, PopupMenu, OptionButton etc
 
+@export_category("Owner Binds")
+
+## → Path to array of objects, relative to owner.
+## One object represents one item
+## Use item_* binds to bind each item's text, icon, etc to each object's property
 @export var array_bind: String:
 	set = _set_array_bind
+
+## ↔ Bind the currently selected item's object to this property on owner
+@export var selected_item: String:
+	set = _set_selected_item
+
+@export_category("Item Binds")
+
+## → Bind this property to the item's text
 @export var item_text: String:
 	set = _set_item_text
 @export var item_icon: String:
@@ -17,8 +30,17 @@ extends Binds
 	set = _set_item_selectable
 @export var item_tooltip: String:
 	set = _set_item_tooltip
+## ← Set this property on the selected item to true/false when selected
+# TODO: ↔ binding?
 @export var item_selected: String:
 	set = _set_item_selected
+
+
+func _get_configuration_warnings() -> PackedStringArray:
+	var result: PackedStringArray
+	if selected_item && "selected" in _binds && _binds.selected:
+		result.append("The binds for selected and selected_item conflict.\nOnly use one of them.")
+	return result
 
 
 func _get_property_list():
@@ -31,6 +53,11 @@ func _set_array_bind(value: String) -> void:
 	assert(Engine.is_editor_hint() || !is_inside_tree())
 	array_bind = value
 
+
+func _set_selected_item(value: String) -> void:
+	assert(Engine.is_editor_hint() || !is_inside_tree())
+	update_configuration_warnings()
+	selected_item = value
 
 func _set_item_text(value: String) -> void:
 	assert(Engine.is_editor_hint() || !is_inside_tree())
@@ -74,6 +101,8 @@ func _get_target():
 	## target can be the parent, but if it's a MenuButton or something similar
 	## try the `get_popup()` method to get the 'real' target
 	var parent := get_parent()
+	if parent is OptionButton:
+		return parent
 	return parent.get_popup() if parent.has_method("get_popup") else parent
 
 
@@ -82,11 +111,12 @@ func _get_value(silent := false):
 	return bt.get_value()
 
 
-func detect_changes(new_value := []) -> bool:
-	if len(new_value) == 0:
+func detect_changes(new_array := []) -> bool:
+	var change_log := []
+	if len(new_array) == 0:
 		var v = _get_value()
-		new_value = v if v != null else []
-	var size = len(new_value)
+		new_array = v if v != null else []
+	var size = len(new_array)
 	var t = _get_target()
 	# TODO: maybe just check for has_method(`get_item_*`)?
 	assert(t is ItemList || t is PopupMenu || t is OptionButton)
@@ -99,12 +129,35 @@ func detect_changes(new_value := []) -> bool:
 	# Todo: track items so we don't have to assign the entire array
 	var change_detected = false
 	for i in range(size):
-		change_detected = _assign_item(t, i, new_value[i]) || change_detected
+		change_detected = _assign_item(t, i, new_array[i]) || change_detected
+	var parent = get_parent()
+	if selected_item && "selected" in parent:
+		var bt := BindTarget.new(selected_item, owner)
+		var item = new_array[parent.selected] if parent.selected >= 0 else null
+		var model_item = bt.get_value()
+		if !_equal_approx(model_item, item):
+			var idx = new_array.find(model_item)
+			parent.selected = idx
+			var new_item = new_array[idx] if idx >= 0 else null
+			if _equal_approx(new_item, model_item):
+				change_detected = true
+				change_log.append(
+					"%s: %s != %s" % [bt.full_path, model_item, item]
+				)
+			else:
+				printerr("WARNING: %s.selected_item %s: %s != %s (could not be assigned?)" % [
+					get_path(),
+					bt.full_path,
+					model_item,
+					new_item
+				])
+	change_detected = change_detected || super()
+	_detected_change_log.append_array(change_log)
 	return change_detected
 
 
 func _on_item_selected(_idx: int) -> void:
-	var bt = BindTarget.new(array_bind, owner)
+	var bt := BindTarget.new(array_bind, owner)
 	var array_model = bt.get_value() if bt else null
 	var target = _get_target()
 	var selected = PackedByteArray()
@@ -114,13 +167,20 @@ func _on_item_selected(_idx: int) -> void:
 			selected[i] = 1
 	else:
 		for i in len(selected):
-			selected[i] = 1 if _idx == 1 else 0
+			selected[i] = 1 if _idx == i else 0
 	if array_model && item_selected:
 		for i in range(target.get_item_count()):
 			var model = array_model[i]
 			var value = selected[i] == 1
 			if model[item_selected] != value:
 				model[item_selected] = value
+	# Fake selected_changed signal
+	if "selected" in get_parent() && "selected" in _binds && _binds.selected:
+		_on_parent_prop_changed0("selected")
+	if selected_item:
+		bt = BindTarget.new(selected_item, owner)
+		bt.set_value(array_model[_idx])
+	DataBindings.detect_changes()
 
 
 func _on_multi_selected(idx: int, _selected: bool) -> void:

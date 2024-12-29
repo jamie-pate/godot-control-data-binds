@@ -46,7 +46,6 @@ func _binds_get_property_list():
 		"class_name": &"",
 		"type": 4,
 		"usage": 128,
-		"hint_text": "BoundPropertyReadonly"
 	}
 	var default_readonly_cat = default_category.duplicate()
 	default_readonly_cat.name = "→ Binds"
@@ -71,15 +70,15 @@ func _binds_get_property_list():
 		if skip:
 			continue
 		var readonly = true
-		p.hint_text = "BoundPropertyReadonly"
 		if p.name in SIGNAL_PROPS:
 			if parent.has_signal(SIGNAL_PROPS[p.name]):
 				readonly = false
-				p.hint_text = "BoundProperty"
 		p.usage = p.usage & (PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_EDITOR | group_or_cat_usage)
 		if !_binds.get(p.name):
 			# don't store bindings that are empty
 			p.usage = p.usage & ~PROPERTY_USAGE_STORAGE
+		# Note hint_string doesn't do anything without a matching hint type
+		# afaict there's no way to add custom docs for properties added by get_property_list
 		p.erase("hint")
 		p.erase("hint_string")
 		p.type = TYPE_STRING
@@ -121,6 +120,7 @@ func _set(prop_name, value):
 			call("_%s" % [method_name], value)
 	else:
 		_binds[prop_name] = value
+		update_configuration_warnings()
 
 
 func _get(prop_name):
