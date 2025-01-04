@@ -139,6 +139,8 @@ func detect_changes(new_array := []) -> bool:
 			var idx = new_array.find(model_item)
 			parent.selected = idx
 			var new_item = new_array[idx] if idx >= 0 else null
+			bt.set_value(new_item)
+			model_item = bt.get_value()
 			if _equal_approx(new_item, model_item):
 				change_detected = true
 				change_log.append(
