@@ -11,6 +11,7 @@ class-definitions-order:
 - prvvars
 - onreadypubvars
 - onreadyprvvars
+- staticvars
 - others
 class-load-variable-name: (([A-Z][a-z0-9]*)+|_?[a-z][a-z0-9]*(_[a-z0-9]+)*)
 class-name: ([A-Z][a-z0-9]*)+

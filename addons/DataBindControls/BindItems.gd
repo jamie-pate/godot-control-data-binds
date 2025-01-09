@@ -35,6 +35,10 @@ extends Binds
 @export var item_selected: String:
 	set = _set_item_selected
 
+var _script_property_list: Array[Dictionary] = get_script().get_script_property_list().filter(
+	func(p): return p.name.begins_with("item_")
+)
+
 
 func _get_configuration_warnings() -> PackedStringArray:
 	var result: PackedStringArray
@@ -58,6 +62,7 @@ func _set_selected_item(value: String) -> void:
 	assert(Engine.is_editor_hint() || !is_inside_tree())
 	update_configuration_warnings()
 	selected_item = value
+
 
 func _set_item_text(value: String) -> void:
 	assert(Engine.is_editor_hint() || !is_inside_tree())
@@ -120,14 +125,16 @@ func detect_changes(new_array := []) -> bool:
 	var t = _get_target()
 	# TODO: maybe just check for has_method(`get_item_*`)?
 	assert(t is ItemList || t is PopupMenu || t is OptionButton)
-
-	while size > t.get_item_count():
-		t.add_item("")
-	while size < t.get_item_count():
-		t.remove_item(t.get_item_count() - 1)
-
 	# Todo: track items so we don't have to assign the entire array
 	var change_detected = false
+
+	while size > t.get_item_count():
+		change_detected = true
+		t.add_item("")
+	while size < t.get_item_count():
+		change_detected = true
+		t.remove_item(t.get_item_count() - 1)
+
 	for i in range(size):
 		change_detected = _assign_item(t, i, new_array[i]) || change_detected
 	var parent = get_parent()
@@ -143,16 +150,14 @@ func detect_changes(new_array := []) -> bool:
 			model_item = bt.get_value()
 			if _equal_approx(new_item, model_item):
 				change_detected = true
-				change_log.append(
-					"%s: %s != %s" % [bt.full_path, model_item, item]
-				)
+				change_log.append("%s: %s != %s" % [bt.full_path, model_item, item])
 			else:
-				printerr("WARNING: %s.selected_item %s: %s != %s (could not be assigned?)" % [
-					get_path(),
-					bt.full_path,
-					model_item,
-					new_item
-				])
+				printerr(
+					(
+						"WARNING: %s.selected_item %s: %s != %s (could not be assigned?)"
+						% [get_path(), bt.full_path, model_item, new_item]
+					)
+				)
 	change_detected = change_detected || super()
 	_detected_change_log.append_array(change_log)
 	return change_detected
@@ -191,39 +196,39 @@ func _on_multi_selected(idx: int, _selected: bool) -> void:
 
 func _assign_item(target: Node, i: int, item) -> bool:
 	var change_detected := false
-	var pl = get_script().get_script_property_list()
+	var pl = _script_property_list
 	for p in pl:
-		if p.name.begins_with("item_"):
-			var set_method_name := "set_%s" % [p.name]
-			var get_method_name := "get_%s" % [p.name]
-			if p.name == "item_selected":
-				# this property follows a different pattern and is only available
-				# on ItemList
-				set_method_name = "select"
-				get_method_name = "is_selected"
+		var set_method_name := "set_%s" % [p.name]
+		var get_method_name := "get_%s" % [p.name]
+		if p.name == "item_selected":
+			# this property follows a different pattern and is only available
+			# on ItemList
+			set_method_name = "select"
+			get_method_name = "is_selected"
 
-			var bind_expr = self[p.name]
-			var bt := BindTarget.new(bind_expr, item) if bind_expr else null
-			if bt && bt.target && target.has_method(get_method_name):
-				var new_value = bt.get_value()
-				var update := true
-				if target.has_method(set_method_name):
-					var old_value = target.call(get_method_name, i)
-					update = typeof(old_value) != typeof(new_value) || old_value != new_value
-					change_detected = change_detected || update
-					if update:
-						_detected_change_log.append(
-							"[%s].%s(): %s != %s" % [i, set_method_name, old_value, new_value]
-						)
+		var bind_expr = self[p.name]
+
+		var bt := BindTarget.new(bind_expr, item) if bind_expr else null
+		if bt && bt.target && target.has_method(get_method_name):
+			var new_value = bt.get_value()
+			var update := true
+			if target.has_method(set_method_name):
+				var old_value = target.call(get_method_name, i)
+				update = typeof(old_value) != typeof(new_value) || old_value != new_value
+				change_detected = change_detected || update
 				if update:
-					if set_method_name == "select":
-						if new_value:
-							# singleselect = false
-							target.select(i, false)
-						else:
-							target.deselect(i)
+					_detected_change_log.append(
+						"[%s].%s(): %s != %s" % [i, set_method_name, old_value, new_value]
+					)
+			if update:
+				if set_method_name == "select":
+					if new_value:
+						# singleselect = false
+						target.select(i, false)
 					else:
-						target.call(set_method_name, i, new_value)
+						target.deselect(i)
+				else:
+					target.call(set_method_name, i, new_value)
 	return change_detected
 
 

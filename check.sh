@@ -72,7 +72,7 @@ if ! [[ -d "$dir/.py_venv" ]]; then
 	PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring python -m pip install 'virtualenv' --user
 	python -m virtualenv .py_venv
 	activate_venv
-	PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring python -m pip install 'gdtoolkit==4.*'
+	PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring python -m pip install 'gdtoolkit==4.3.2'
 else
 	activate_venv
 fi
