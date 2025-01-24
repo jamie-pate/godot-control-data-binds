@@ -8,6 +8,7 @@ var array: Array
 var time: String
 var icon: Texture = null
 
+
 func array_callable():
 	return array
 
