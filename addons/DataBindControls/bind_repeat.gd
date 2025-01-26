@@ -18,6 +18,7 @@ var _template: Control = null
 var _template_connections := []
 var _owner
 var _detected_change_log := []
+var _bound_array: BindTarget
 
 
 func _init():
@@ -28,6 +29,7 @@ func _ready():
 	if Engine.is_editor_hint():
 		return
 	call_deferred("_deferred_ready")
+	_bound_array = BindTarget.new(array_bind, owner)
 
 
 func _deferred_ready():
@@ -53,15 +55,15 @@ func _deferred_ready():
 	_template.remove_child(self)
 	tparent.add_child(self, false, Node.INTERNAL_MODE_BACK)
 	tparent.remove_child(_template)
-	var value = _get_value(true)
+	var value = _get_array_value()
 	if value != null:
 		detect_changes(value)
 
 
-func _get_value(silent := false):
+func _get_array_value():
 	if array_bind && target_property:
-		var bt = BindTarget.new(array_bind, owner, silent)
-		return bt.get_value() if bt.target else null
+		var target = _bound_array.get_target()
+		return _bound_array.get_value(target) if target else null
 	return null
 
 
@@ -81,7 +83,7 @@ func detect_changes(new_value: Array = []) -> bool:
 	if !_template:
 		return false
 	if len(new_value) == 0:
-		var v = _get_value()
+		var v = _get_array_value()
 		new_value = v if v != null else []
 	var p := get_parent()
 	var size = len(new_value)

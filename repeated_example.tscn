@@ -112,6 +112,7 @@ script = ExtResource("2")
 text = "item.text"
 
 [node name="TextEdit" type="TextEdit" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 text = "text: root1
 pressed: False

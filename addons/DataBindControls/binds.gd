@@ -8,6 +8,7 @@ extends Node
 const BindTarget := preload("./bind_target.gd")
 const Util := preload("./util.gd")
 const NUM_TYPES: Array[Variant.Type] = [TYPE_INT, TYPE_FLOAT]
+const OBJ_TYPES: Array[Variant.Type] = [TYPE_NIL, TYPE_OBJECT]
 
 const PASSTHROUGH_PROPS := [
 	"editor_description", "process_mode", "process_priority", "script", "import_path"
@@ -22,6 +23,7 @@ const SIGNAL_PROPS := {
 	selected = "item_selected"
 }
 
+var _bound_targets := {}
 var _binds := {}
 var _detected_change_log := []
 
@@ -154,8 +156,10 @@ func _bind_target(p: String, parent: Node) -> void:
 	var b := _binds[p] as String
 	if b:
 		var bt = BindTarget.new(b, owner)
-		if bt.target:
-			parent[p] = bt.get_value()
+		var target = bt.get_target()
+		_bound_targets[b] = bt
+		if target:
+			parent[p] = bt.get_value(target)
 	var sig_map = Util.get_sig_map(parent)
 	if p in SIGNAL_PROPS:
 		var sig = SIGNAL_PROPS[p]
@@ -176,7 +180,7 @@ func _unbind_targets():
 	assert(parent)
 	for p in _binds:
 		_unbind_target(p, parent)
-
+	_bound_targets = {}
 	if parent.has_signal("visibility_changed"):
 		parent.visibility_changed.disconnect(_on_parent_visibility_changed)
 
@@ -209,12 +213,11 @@ func _on_parent_prop_changed1(value, prop_name: String):
 	if prop_name != "visible" && !parent.is_visible_in_tree():
 		return
 	value = parent[prop_name]
-	var path = _binds[prop_name]
-	if path:
-		var bt = BindTarget.new(path, owner)
-		if bt.get_value() != value:
-			bt.set_value(value)
-			DataBindings.detect_changes()
+	var bt = _bound_targets[_binds[prop_name]]
+	var target = bt.get_target()
+	if bt.get_value(target) != value:
+		bt.set_value(target, value)
+		DataBindings.detect_changes()
 
 
 func detect_changes() -> bool:
@@ -225,11 +228,13 @@ func detect_changes() -> bool:
 			continue
 		var b := _binds[p] as String
 		if b:
-			var bt = BindTarget.new(b, owner)
-			if bt.target:
+			var bt = _bound_targets[b]
+			assert(bt.root == owner)
+			var target = bt.get_target()
+			if target:
 				var parent = get_parent()
 				if parent.is_visible_in_tree() || p == "visible":
-					var value = bt.get_value()
+					var value = bt.get_value(target)
 					if !_equal_approx(parent[p], value):
 						_detected_change_log.append(
 							"%s: %s != %s" % [bt.full_path, parent[p], value]
@@ -247,9 +252,12 @@ func detect_changes() -> bool:
 func _equal_approx(a, b):
 	var a_type := typeof(a)
 	var b_type := typeof(b)
-	# only compare different types if they are both numbers
-	if a_type != b_type && !(a_type in NUM_TYPES && b_type in NUM_TYPES):
-		return false
+	if a_type != b_type:
+		# compare different types if they are both numbers
+		var numbers = a_type in NUM_TYPES && b_type in NUM_TYPES
+		var objects = a_type in OBJ_TYPES && b_type in OBJ_TYPES
+		if !numbers && !objects:
+			return false
 	if a_type == TYPE_FLOAT || b_type == TYPE_FLOAT:
 		return is_equal_approx(a, b)
 	return a == b
