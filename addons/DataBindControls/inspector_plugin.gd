@@ -1,7 +1,7 @@
 extends EditorInspectorPlugin
 
-const BindEditor := preload("./BindEditor.gd")
-const Binds := preload("./Binds.gd")
+const BindEditor := preload("./bind_editor.gd")
+const Binds := preload("./binds.gd")
 
 
 func can_handle(object: Object):

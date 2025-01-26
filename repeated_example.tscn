@@ -1,9 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://ddkq3rwuwxo1d"]
 
-[ext_resource type="Script" path="res://Example.gd" id="1"]
-[ext_resource type="Script" path="res://addons/DataBindControls/Binds.gd" id="2"]
+[ext_resource type="Script" path="res://repeated_example.gd" id="1_qsp2h"]
+[ext_resource type="Script" path="res://addons/DataBindControls/binds.gd" id="2"]
 
-[node name="RepeatPanel" type="Panel"]
+[node name="RepeatedControl" type="Panel"]
+custom_minimum_size = Vector2(0, 200)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -12,7 +13,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource("1")
+script = ExtResource("1_qsp2h")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -35,8 +36,10 @@ _import_path = ""
 unique_name_in_owner = ""
 process_physics_priority = ""
 process_thread_group = ""
+physics_interpolation_mode = ""
+auto_translate_mode = ""
 script = ExtResource("2")
-texture = "model.icon"
+texture = "item.icon"
 
 [node name="Button" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -50,8 +53,10 @@ _import_path = ""
 unique_name_in_owner = ""
 process_physics_priority = ""
 process_thread_group = ""
+physics_interpolation_mode = ""
+auto_translate_mode = ""
 script = ExtResource("2")
-text = "model.text"
+text = "item.text"
 
 [node name="CheckBox" type="CheckBox" parent="VBoxContainer"]
 layout_mode = 2
@@ -61,8 +66,10 @@ _import_path = ""
 unique_name_in_owner = ""
 process_physics_priority = ""
 process_thread_group = ""
+physics_interpolation_mode = ""
+auto_translate_mode = ""
 script = ExtResource("2")
-button_pressed = "model.pressed"
+button_pressed = "item.pressed"
 
 [node name="CheckButton" type="CheckButton" parent="VBoxContainer"]
 layout_mode = 2
@@ -72,8 +79,10 @@ _import_path = ""
 unique_name_in_owner = ""
 process_physics_priority = ""
 process_thread_group = ""
+physics_interpolation_mode = ""
+auto_translate_mode = ""
 script = ExtResource("2")
-button_pressed = "model.pressed"
+button_pressed = "item.pressed"
 
 [node name="TextEdit3" type="TextEdit" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 38)
@@ -84,8 +93,10 @@ _import_path = ""
 unique_name_in_owner = ""
 process_physics_priority = ""
 process_thread_group = ""
+physics_interpolation_mode = ""
+auto_translate_mode = ""
 script = ExtResource("2")
-text = "model.text"
+text = "item.text"
 
 [node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
 layout_mode = 2
@@ -95,8 +106,10 @@ _import_path = ""
 unique_name_in_owner = ""
 process_physics_priority = ""
 process_thread_group = ""
+physics_interpolation_mode = ""
+auto_translate_mode = ""
 script = ExtResource("2")
-text = "model.text"
+text = "item.text"
 
 [node name="TextEdit" type="TextEdit" parent="VBoxContainer"]
 layout_mode = 2

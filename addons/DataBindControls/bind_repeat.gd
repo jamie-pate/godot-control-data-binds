@@ -6,8 +6,8 @@ extends Node
 ## Bind items in an array to be repeated using the parent template.
 ## Each array item will instance the template once in the grandparent control.
 
-const Util := preload("./Util.gd")
-const BindTarget := preload("./BindTarget.gd")
+const Util := preload("./util.gd")
+const BindTarget := preload("./bind_target.gd")
 
 @export var array_bind: String:
 	set = _set_array_bind

@@ -1,6 +1,6 @@
 extends GutTest
 
-const REPEATED_CONTROL_HOST = preload("./RepeatedControlHost.tscn")
+const REPEATED_CONTROL_HOST = preload("./repeated_control_host.tscn")
 
 
 func test_bind_repeat():

@@ -1,6 +1,6 @@
 extends Node
 
-const Util = preload("./Util.gd")
+const Util = preload("./util.gd")
 
 const MAX_CHANGES = 100
 const MAX_CHANGES_LOGGED = 20

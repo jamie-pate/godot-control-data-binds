@@ -5,8 +5,8 @@ extends Node
 
 ## Bind properties against a single control
 
-const BindTarget := preload("./BindTarget.gd")
-const Util := preload("./Util.gd")
+const BindTarget := preload("./bind_target.gd")
+const Util := preload("./util.gd")
 const NUM_TYPES: Array[Variant.Type] = [TYPE_INT, TYPE_FLOAT]
 
 const PASSTHROUGH_PROPS := [
