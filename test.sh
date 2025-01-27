@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 version=4.3-stable
 
-run_godot() {
+run_test() {
     # this got a bit complicated because gut doesn't detect SCRIPT ERRORs :(
     # https://github.com/bitwes/Gut/issues/210
     local errfile="$(mktemp)"
@@ -22,6 +22,23 @@ run_godot() {
     fi
     return $result
 }
+
+run_bench() {
+    "$1" --headless res://tests/benchmark.tscn -- "${2:-benchmark.json}"
+    return $?
+}
+
+bench_flag=1
+test_flag=1
+
+if [ "$1" == "--benchmark-only" ]; then
+    test_flag=0
+    shift
+elif [ "$1" == "--test-only" ]; then
+    bench_flag=0
+    shift
+fi
+
 suffixes=(
     _linux.x86_64
     _win64.exe
@@ -36,8 +53,18 @@ for s in "${suffixes[@]}"; do
         bin=godot
     fi
     if [ -x "$(which $bin)" ]; then
-        run_godot "$bin"
-        exit $?
+        set +e
+        bench_result=0
+        test_result=0
+        if [ $test_flag == 1 ]; then
+            run_test "$bin"
+            test_result=$?
+        fi
+        if [ $bench_flag == 1 ]; then
+            run_bench "$bin" "$@"
+            bench_result=$?
+        fi
+        exit $(( $test_result + $bench_result ))
     fi
 done
 

@@ -28,10 +28,6 @@ var _binds := {}
 var _detected_change_log := []
 
 
-func _init():
-	add_to_group(Util.BIND_GROUP)
-
-
 func _get_property_list():
 	# it seems impossible to do an inherited call of _get_property_list() directly.
 	return _binds_get_property_list()
@@ -138,12 +134,14 @@ func _enter_tree():
 	if Engine.is_editor_hint():
 		return
 	_bind_targets()
+	DataBindings.add_bind(self)
 
 
 func _bind_targets():
 	var parent := get_parent()
 	for p in _binds:
 		_bind_target(p, parent)
+	# visibility changed notifications don't propagate to non-controls
 	if parent.has_signal("visibility_changed"):
 		parent.visibility_changed.connect(_on_parent_visibility_changed)
 
@@ -172,6 +170,7 @@ func _bind_target(p: String, parent: Node) -> void:
 func _exit_tree():
 	if Engine.is_editor_hint():
 		return
+	DataBindings.remove_bind(self)
 	_unbind_targets()
 
 
@@ -183,6 +182,10 @@ func _unbind_targets():
 	_bound_targets = {}
 	if parent.has_signal("visibility_changed"):
 		parent.visibility_changed.disconnect(_on_parent_visibility_changed)
+
+
+func _on_parent_visibility_changed():
+	DataBindings.update_bind_visibility(self)
 
 
 func _unbind_target(p: String, parent: Node):
@@ -198,20 +201,12 @@ func _unbind_target(p: String, parent: Node):
 			parent.disconnect(SIGNAL_PROPS[p], Callable(self, method))
 
 
-func _on_parent_visibility_changed():
-	# If visibility changes we need to redetect changes because
-	# changes are ignored when controls are hidden.
-	DataBindings.detect_changes()
-
-
 func _on_parent_prop_changed0(prop_name: String):
 	_on_parent_prop_changed1(null, prop_name)
 
 
 func _on_parent_prop_changed1(value, prop_name: String):
 	var parent := get_parent()
-	if prop_name != "visible" && !parent.is_visible_in_tree():
-		return
 	value = parent[prop_name]
 	var bt = _bound_targets[_binds[prop_name]]
 	var target = bt.get_target()
@@ -233,19 +228,16 @@ func detect_changes() -> bool:
 			var target = bt.get_target()
 			if target:
 				var parent = get_parent()
-				if parent.is_visible_in_tree() || p == "visible":
-					var value = bt.get_value(target)
-					if !_equal_approx(parent[p], value):
-						_detected_change_log.append(
-							"%s: %s != %s" % [bt.full_path, parent[p], value]
-						)
-						changes_detected = true
-						var cp
-						if "caret_column" in parent:
-							cp = parent.caret_column
-						parent[p] = value
-						if "caret_column" in parent:
-							parent.caret_column = cp
+				var value = bt.get_value(target)
+				if !_equal_approx(parent[p], value):
+					_detected_change_log.append("%s: %s != %s" % [bt.full_path, parent[p], value])
+					changes_detected = true
+					var cp
+					if "caret_column" in parent:
+						cp = parent.caret_column
+					parent[p] = value
+					if "caret_column" in parent:
+						parent.caret_column = cp
 	return changes_detected
 
 
@@ -261,6 +253,10 @@ func _equal_approx(a, b):
 	if a_type == TYPE_FLOAT || b_type == TYPE_FLOAT:
 		return is_equal_approx(a, b)
 	return a == b
+
+
+func change_count():
+	return len(_detected_change_log)
 
 
 func get_desc():

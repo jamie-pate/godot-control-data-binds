@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://s647ot4qd3vq"]
+
+[ext_resource type="Script" path="res://tests/visibility/visibility_rig.gd" id="1_kgjgr"]
+[ext_resource type="PackedScene" uid="uid://dkary3a5e5dp6" path="res://tests/visibility/visibility_rig_content.tscn" id="2_r3pvu"]
+
+[node name="VisibilityRig" type="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kgjgr")
+
+[node name="BoxContainer" type="BoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VisibilityRigContent" parent="BoxContainer" instance=ExtResource("2_r3pvu")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="BoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="BoxContainer/SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(574, 648)
+render_target_update_mode = 4
+
+[node name="VpVisibilityRigContent" parent="BoxContainer/SubViewportContainer/SubViewport" instance=ExtResource("2_r3pvu")]
+unique_name_in_owner = true

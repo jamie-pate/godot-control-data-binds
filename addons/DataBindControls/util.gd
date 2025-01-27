@@ -1,7 +1,5 @@
 extends RefCounted
 
-const BIND_GROUP = "__DataBindingBind__"
-
 
 static func get_sig_map(obj) -> Dictionary:
 	var sig_map := {}

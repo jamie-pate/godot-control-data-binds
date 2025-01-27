@@ -121,7 +121,7 @@ func _get_items_target():
 	return parent.get_popup() if parent.has_method("get_popup") else parent
 
 
-func _get_array_value(silent := false):
+func _get_array_value():
 	var target = _bound_array.get_target()
 	return _bound_array.get_value(target) if target else []
 

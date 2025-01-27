@@ -21,10 +21,6 @@ var _detected_change_log := []
 var _bound_array: BindTarget
 
 
-func _init():
-	add_to_group(Util.BIND_GROUP)
-
-
 func _ready():
 	if Engine.is_editor_hint():
 		return
@@ -108,15 +104,18 @@ func detect_changes(new_value: Array = []) -> bool:
 	return change_detected
 
 
-func _assign_item(child, item, i):
+func _assign_item(child, item, i) -> bool:
+	var result := false
 	if array_bind && target_property in child:
 		var m = child[target_property]
 		var current_value = child[target_property]
 		if typeof(current_value) != typeof(item) || current_value != item:
+			result = true
 			_detected_change_log.append(
 				"[%s].%s: %s != %s" % [i, target_property, current_value, item]
 			)
 			child[target_property] = item
+	return result
 
 
 func _notification(what):
@@ -126,6 +125,10 @@ func _notification(what):
 			_template = null
 
 
+func _parent_visibility_changed():
+	DataBindings.update_bind_visibility(self)
+
+
 func _enter_tree():
 	if Engine.is_editor_hint():
 		return
@@ -133,6 +136,23 @@ func _enter_tree():
 		owner = _owner
 		_owner = null
 		assert(owner)
+	DataBindings.add_bind(self)
+	var p := get_parent()
+	if p && p.has_signal("visibility_changed"):
+		p.visibility_changed.connect(_parent_visibility_changed)
+
+
+func _exit_tree():
+	if Engine.is_editor_hint():
+		return
+	DataBindings.remove_bind(self)
+	var p := get_parent()
+	if p && p.has_signal("visibility_changed"):
+		p.visibility_changed.disconnect(_parent_visibility_changed)
+
+
+func change_count():
+	return len(_detected_change_log)
 
 
 func get_desc():
