@@ -5,7 +5,9 @@ run_test() {
     # this got a bit complicated because gut doesn't detect SCRIPT ERRORs :(
     # https://github.com/bitwes/Gut/issues/210
     local errfile="$(mktemp)"
-    "$1" --headless -v -s addons/gut/gut_cmdln.gd -gconfig tests/.gutconfig.json 2> "$errfile" &
+    local cmd="$1"
+    shift
+    "$cmd" --headless -v -s addons/gut/gut_cmdln.gd -gconfig tests/.gutconfig.json "$@" 2> "$errfile" &
     pid=$!
     tail -f "$errfile" &
     tailpid=$!
@@ -24,7 +26,9 @@ run_test() {
 }
 
 run_bench() {
-    "$1" --headless res://tests/benchmark.tscn -- "${2:-benchmark.json}"
+    local cmd="$1"
+    local output_json="${2:-benchmark.json}"
+    "$cmd" --headless res://tests/benchmark.tscn -- "$output_json"
     return $?
 }
 
@@ -57,7 +61,7 @@ for s in "${suffixes[@]}"; do
         bench_result=0
         test_result=0
         if [ $test_flag == 1 ]; then
-            run_test "$bin"
+            run_test "$bin" "$@"
             test_result=$?
         fi
         if [ $bench_flag == 1 ]; then

@@ -11,7 +11,9 @@ var vp_info := ViewportInfo.new()
 var _change_detection_queued := false
 var _vp_visibility_update_queued := false
 var _changes_detected := 0
+## Number of iterations taken in the most recent change detection
 var _detection_iterations := 0
+## number of times _detect_changes() has been called
 var _detection_count := 0
 var _visible_binds: Dictionary
 var _binds: Dictionary
@@ -210,8 +212,6 @@ func _detect_changes():
 		var timings: Array[String]
 		for bind in _visible_binds.keys():
 			var b_start := Time.get_ticks_usec()
-			if !_should_detect_changes(bind):
-				continue
 			var cd := bind.detect_changes() as bool
 			if cd:
 				while len(change_log) > MAX_CHANGES_LOGGED:
@@ -253,15 +253,3 @@ func _detect_changes():
 	_detection_iterations = i
 	_change_detection_queued = false
 	return result
-
-
-func _should_detect_changes(bind: Node):
-	var p := bind.get_parent()
-	if p:
-		var gp := p.get_parent()
-		if (gp is Node3D || gp is Control) && !gp.is_visible_in_tree():
-			return false
-	var vp := p.get_viewport() as SubViewport
-	if vp:
-		return vp_info.is_visible(vp)
-	return true

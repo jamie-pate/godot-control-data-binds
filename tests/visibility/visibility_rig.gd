@@ -36,7 +36,13 @@ func reverse_items():
 	%VpVisibilityRigContent.items.reverse()
 
 
-func rig_visibility(content: bool, viewport: bool):
+func get_items(vr: bool) -> Array[ExampleItem]:
+	if vr:
+		return %VpVisibilityRigContent.items
+	return %VisibilityRigContent.items
+
+
+func rig_visibility(content: bool, viewport: bool, dont_wait := false):
 	DataBindings._vbind_minus = 0
 	DataBindings._vbind_plus = 0
 	DataBindings._vbind_time = 0
@@ -49,6 +55,8 @@ func rig_visibility(content: bool, viewport: bool):
 	vr_content.visible = content
 	vp_container.visible = viewport
 	d = Time.get_ticks_usec() - start
+	if dont_wait:
+		return
 	var vbind_time = DataBindings._vbind_time
 	# reset _vbind_time so we don't double count time taken before this line
 	DataBindings._vbind_time = 0
@@ -98,5 +106,11 @@ func rig_visibility(content: bool, viewport: bool):
 
 ## Check binds for items that haven't been updated to match.
 ## Each non-matching item appends it's path to the result
-func check_binds() -> Array[String]:
-	return %VisibilityRigContent.check_binds() + %VpVisibilityRigContent.check_binds()
+func check_binds_ignoring_visibility() -> Array[String]:
+	var result = %VisibilityRigContent.check_binds() + %VpVisibilityRigContent.check_binds()
+	var shorten = func(s):
+		return s.replace(str($BoxContainer.get_path()), "").replace(
+			"VBoxContainer/RepeatedControl/VBoxContainer", ".."
+		)
+	result.assign(result.map(shorten))
+	return result
