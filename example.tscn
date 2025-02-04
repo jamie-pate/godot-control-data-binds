@@ -1,10 +1,10 @@
 [gd_scene load_steps=7 format=3 uid="uid://ck6v3p607f1pn"]
 
-[ext_resource type="Script" path="res://addons/DataBindControls/Binds.gd" id="1"]
-[ext_resource type="Script" path="res://Example.gd" id="2"]
-[ext_resource type="Script" path="res://addons/DataBindControls/BindRepeat.gd" id="3"]
-[ext_resource type="PackedScene" uid="uid://ddkq3rwuwxo1d" path="res://RepeatedExample.tscn" id="4"]
-[ext_resource type="Script" path="res://addons/DataBindControls/BindItems.gd" id="5"]
+[ext_resource type="Script" path="res://addons/DataBindControls/binds.gd" id="1"]
+[ext_resource type="Script" path="res://example.gd" id="1_so716"]
+[ext_resource type="Script" path="res://addons/DataBindControls/bind_repeat.gd" id="3"]
+[ext_resource type="PackedScene" uid="uid://ddkq3rwuwxo1d" path="res://repeated_example.tscn" id="4"]
+[ext_resource type="Script" path="res://addons/DataBindControls/bind_items.gd" id="5"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
 bg_color = Color(0.196078, 0.196078, 0.196078, 1)
@@ -17,7 +17,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource("2")
+script = ExtResource("1_so716")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 0
@@ -46,7 +46,7 @@ process_thread_group = ""
 physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("1")
-text = "model.text"
+text = "text"
 
 [node name="CheckBox" type="CheckBox" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -59,7 +59,7 @@ process_thread_group = ""
 physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("1")
-button_pressed = "model.pressed"
+button_pressed = "pressed"
 
 [node name="CheckButton" type="CheckButton" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -72,7 +72,7 @@ process_thread_group = ""
 physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("1")
-button_pressed = "model.pressed"
+button_pressed = "pressed"
 
 [node name="TextEdit" type="TextEdit" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 38)
@@ -86,7 +86,7 @@ process_thread_group = ""
 physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("1")
-text = "model.text"
+text = "text"
 
 [node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -99,7 +99,7 @@ process_thread_group = ""
 physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("1")
-text = "model.text"
+text = "text"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -122,7 +122,7 @@ process_thread_group = ""
 physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("1")
-text = "model_yaml.value"
+text = "model_yaml"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -144,7 +144,7 @@ process_thread_group = ""
 physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("5")
-array_bind = "model.array"
+array_bind = "array"
 item_text = "text"
 item_icon = "icon"
 item_selected = "pressed"
@@ -158,15 +158,15 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="RepeatPanel" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat" instance=ExtResource("4")]
+[node name="RepeatedControl" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat" instance=ExtResource("4")]
 custom_minimum_size = Vector2(0, 145)
 layout_mode = 2
 theme_override_styles/panel = SubResource("1")
 
-[node name="BindRepeat" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatPanel"]
+[node name="BindRepeat" type="Node" parent="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatedControl"]
 script = ExtResource("3")
-array_bind = "model.array_callable()"
-target_property = "model"
+array_bind = "filtered_array()"
+target_property = "item"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -182,12 +182,12 @@ process_thread_group = ""
 physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("1")
-text = "model.time"
+text = "time"
 
 [node name="Timer" type="Timer" parent="VBoxContainer/HBoxContainer2"]
 wait_time = 10.0
 autostart = true
 
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/AddButton" to="." method="_on_AddButton_pressed"]
-[connection signal="remove" from="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatPanel" to="." method="_on_RepeatPanel_remove"]
+[connection signal="remove" from="VBoxContainer/HBoxContainer/VBoxContainer2/ScrollContainer/VBCRepeat/RepeatedControl" to="." method="_on_RepeatPanel_remove"]
 [connection signal="timeout" from="VBoxContainer/HBoxContainer2/Timer" to="." method="_on_Timer_timeout"]

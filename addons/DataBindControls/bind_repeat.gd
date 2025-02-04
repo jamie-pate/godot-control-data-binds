@@ -6,8 +6,8 @@ extends Node
 ## Bind items in an array to be repeated using the parent template.
 ## Each array item will instance the template once in the grandparent control.
 
-const Util := preload("./Util.gd")
-const BindTarget := preload("./BindTarget.gd")
+const Util := preload("./util.gd")
+const BindTarget := preload("./bind_target.gd")
 
 @export var array_bind: String:
 	set = _set_array_bind
@@ -18,16 +18,14 @@ var _template: Control = null
 var _template_connections := []
 var _owner
 var _detected_change_log := []
-
-
-func _init():
-	add_to_group(Util.BIND_GROUP)
+var _bound_array: BindTarget
 
 
 func _ready():
 	if Engine.is_editor_hint():
 		return
 	call_deferred("_deferred_ready")
+	_bound_array = BindTarget.new(array_bind, owner)
 
 
 func _deferred_ready():
@@ -53,15 +51,15 @@ func _deferred_ready():
 	_template.remove_child(self)
 	tparent.add_child(self, false, Node.INTERNAL_MODE_BACK)
 	tparent.remove_child(_template)
-	var value = _get_value(true)
+	var value = _get_array_value()
 	if value != null:
 		detect_changes(value)
 
 
-func _get_value(silent := false):
+func _get_array_value():
 	if array_bind && target_property:
-		var bt = BindTarget.new(array_bind, owner, silent)
-		return bt.get_value() if bt.target else null
+		var target = _bound_array.get_target()
+		return _bound_array.get_value(target) if target else null
 	return null
 
 
@@ -81,7 +79,7 @@ func detect_changes(new_value: Array = []) -> bool:
 	if !_template:
 		return false
 	if len(new_value) == 0:
-		var v = _get_value()
+		var v = _get_array_value()
 		new_value = v if v != null else []
 	var p := get_parent()
 	var size = len(new_value)
@@ -106,15 +104,18 @@ func detect_changes(new_value: Array = []) -> bool:
 	return change_detected
 
 
-func _assign_item(child, item, i):
+func _assign_item(child, item, i) -> bool:
+	var result := false
 	if array_bind && target_property in child:
 		var m = child[target_property]
 		var current_value = child[target_property]
 		if typeof(current_value) != typeof(item) || current_value != item:
+			result = true
 			_detected_change_log.append(
 				"[%s].%s: %s != %s" % [i, target_property, current_value, item]
 			)
 			child[target_property] = item
+	return result
 
 
 func _notification(what):
@@ -124,6 +125,10 @@ func _notification(what):
 			_template = null
 
 
+func _parent_visibility_changed():
+	DataBindings.update_bind_visibility(self)
+
+
 func _enter_tree():
 	if Engine.is_editor_hint():
 		return
@@ -131,6 +136,23 @@ func _enter_tree():
 		owner = _owner
 		_owner = null
 		assert(owner)
+	DataBindings.add_bind(self)
+	var p := get_parent()
+	if p && p.has_signal("visibility_changed"):
+		p.visibility_changed.connect(_parent_visibility_changed)
+
+
+func _exit_tree():
+	if Engine.is_editor_hint():
+		return
+	DataBindings.remove_bind(self)
+	var p := get_parent()
+	if p && p.has_signal("visibility_changed"):
+		p.visibility_changed.disconnect(_parent_visibility_changed)
+
+
+func change_count():
+	return len(_detected_change_log)
 
 
 func get_desc():

@@ -1,6 +1,6 @@
 extends GutTest
 
-const REPEATED_CONTROL_HOST = preload("./RepeatedControlHost.tscn")
+const REPEATED_CONTROL_HOST = preload("./repeated_control_host.tscn")
 
 
 func test_bind_repeat():
@@ -8,13 +8,12 @@ func test_bind_repeat():
 	add_child_autoqfree(repeated_control_host)
 
 	# not sure why this takes 2 frames to call the deferred method
-	await RenderingServer.frame_post_draw
-	await RenderingServer.frame_post_draw
+	await wait_frames(1)
 
 	assert_eq(repeated_control_host.get_child_count(), 0)
 	repeated_control_host.model.append("text")
 	DataBindings.detect_changes()
-	await RenderingServer.frame_post_draw
+	await wait_frames(1)
 	assert_eq(repeated_control_host.get_child_count(), 1)
 	var label = repeated_control_host.get_child(0)
 	assert_eq(label.text if label else null, "text")

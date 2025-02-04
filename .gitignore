@@ -1,5 +1,7 @@
 /.godot
-addons/*
+/addons/*
 !addons/DataBindControls
+/benchmark.json
+
 .py_venv
 .DS_STORE
