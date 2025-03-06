@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bmd7vewvitvxo"]
 
-[ext_resource type="Script" path="res://tests/benchmark.gd" id="1_tf50s"]
+[ext_resource type="Script" uid="uid://c6ttc1hcy40yj" path="res://tests/benchmark.gd" id="1_tf50s"]
 [ext_resource type="PackedScene" uid="uid://s647ot4qd3vq" path="res://tests/visibility/visibility_rig.tscn" id="2_liiis"]
 
 [node name="Benchmark" type="Panel"]

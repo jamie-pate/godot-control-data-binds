@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://s647ot4qd3vq"]
 
-[ext_resource type="Script" path="res://tests/visibility/visibility_rig.gd" id="1_kgjgr"]
+[ext_resource type="Script" uid="uid://do8muyetdkc07" path="res://tests/visibility/visibility_rig.gd" id="1_kgjgr"]
 [ext_resource type="PackedScene" uid="uid://dkary3a5e5dp6" path="res://tests/visibility/visibility_rig_content.tscn" id="2_r3pvu"]
 
 [node name="VisibilityRig" type="Panel"]

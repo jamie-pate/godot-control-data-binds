@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://dkary3a5e5dp6"]
 
-[ext_resource type="Script" path="res://tests/visibility/visibility_rig_content.gd" id="1_5aaji"]
+[ext_resource type="Script" uid="uid://b22dn0fasopc8" path="res://tests/visibility/visibility_rig_content.gd" id="1_5aaji"]
 [ext_resource type="PackedScene" uid="uid://ddkq3rwuwxo1d" path="res://repeated_example.tscn" id="1_luv4n"]
-[ext_resource type="Script" path="res://addons/DataBindControls/bind_repeat.gd" id="2_3ixi3"]
+[ext_resource type="Script" uid="uid://b18nci1e4b2q6" path="res://addons/DataBindControls/bind_repeat.gd" id="2_3ixi3"]
 
 [node name="VisibilityRigContent" type="ScrollContainer"]
 anchors_preset = 15

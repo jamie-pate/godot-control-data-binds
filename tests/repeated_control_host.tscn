@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dtu0iv2dbkinx"]
 
-[ext_resource type="Script" path="res://tests/repeated_control_host.gd" id="1_say2d"]
-[ext_resource type="Script" path="res://addons/DataBindControls/bind_repeat.gd" id="3_w8au5"]
+[ext_resource type="Script" uid="uid://dc1btd1d3asop" path="res://tests/repeated_control_host.gd" id="1_say2d"]
+[ext_resource type="Script" uid="uid://b18nci1e4b2q6" path="res://addons/DataBindControls/bind_repeat.gd" id="3_w8au5"]
 
 [node name="RepeatedControlHost" type="Control"]
 layout_mode = 3
