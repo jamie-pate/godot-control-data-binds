@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://ddkq3rwuwxo1d"]
 
 [ext_resource type="Script" uid="uid://bth6gpf3mc1s" path="res://repeated_example.gd" id="1_qsp2h"]
-[ext_resource type="Script" uid="uid://7apnvjk601pl" path="res://addons/DataBindControls/binds.gd" id="2"]
+[ext_resource type="Script" uid="uid://njl7labrgiya" path="res://addons/DataBindControls/binds.gd" id="2"]
 
 [node name="RepeatedControl" type="Panel"]
 custom_minimum_size = Vector2(0, 200)

@@ -7,7 +7,6 @@ func test_bind_repeat():
 	var repeated_control_host = REPEATED_CONTROL_HOST.instantiate()
 	add_child_autoqfree(repeated_control_host)
 
-	# not sure why this takes 2 frames to call the deferred method
 	await wait_frames(1)
 
 	assert_eq(repeated_control_host.get_child_count(), 0)

@@ -24,6 +24,8 @@ var _vbind_time: int
 
 
 class DrawDetector:
+	## Detects when a SubViewport has had it's contents drawn
+	## Doesn't make sense to use this for Window since they always draw
 	extends Control
 
 	signal draw_requested
@@ -73,7 +75,7 @@ class ViewportInfo:
 	func get_were_visible():
 		return _were_visible.duplicate()
 
-	func is_visible(vp: SubViewport) -> bool:
+	func is_visible(vp: Viewport) -> bool:
 		var new_frame := Engine.get_frames_drawn()
 		var rid := vp.get_viewport_rid()
 		if _frame == new_frame:
@@ -81,12 +83,14 @@ class ViewportInfo:
 		else:
 			_frame = new_frame
 			_cache.clear()
-		var size := vp.size
+		var size := vp.size as Vector2i
 		var result = 0
 		# SubViewport must be a child of Node3D or CanvasItem
 		var parent = vp.get_parent() as Node3D
 		if !parent:
 			parent = vp.get_parent() as CanvasItem
+		if !parent && vp is Window:
+			parent = vp
 		assert(
 			parent,
 			"Any SubViewport that contains Binds must have a Node3D or CanvasItem for a parent"
@@ -103,18 +107,27 @@ class ViewportInfo:
 			if parent.has_signal("visibility_changed"):
 				parent.visibility_changed.connect(_vp_changed)
 			_seen[rid] = pid
-		if parent && !parent.is_visible_in_tree():
+		var parent_visible = (
+			parent.is_visible_in_tree() if parent is SubViewport else parent.visible
+		)
+		if parent && !parent_visible:
 			result = 0
-		elif size.x < MIN_SIZE && size.y < MIN_SIZE:
+		elif vp is SubViewport && size.x < MIN_SIZE && size.y < MIN_SIZE:
+			# Don't discard visible windows, even if they are tiny, but tiny subviewports
+			# shouldn't be updated
 			result = -(OFFSET + MIN_SIZE)
-		else:
-			var mode := vp.render_target_update_mode
+		elif vp is SubViewport:
+			var svp: SubViewport = vp
+			var mode := svp.render_target_update_mode
 			result = OFFSET + mode
 			if mode == SubViewport.UPDATE_DISABLED:
 				result = 0
 			elif mode in [SubViewport.UPDATE_WHEN_VISIBLE, SubViewport.UPDATE_WHEN_PARENT_VISIBLE]:
-				DrawDetector.ensure(vp, _vp_changed)
-				result = 1 if DrawDetector.drawn(vp) else 0
+				DrawDetector.ensure(svp, _vp_changed)
+				result = 1 if DrawDetector.drawn(svp) else 0
+		else:
+			# window always draws
+			result = OFFSET + SubViewport.UPDATE_ALWAYS
 		_cache[rid] = result
 		_were_visible[rid] = result > 0
 		return result > 0
@@ -146,7 +159,7 @@ func _vp_visibility_update(were_visible: Dictionary):
 	# it was checked during detect_changes
 	var vp_vis_same := {}
 	for bind in _binds:
-		var vp := bind.get_viewport() as SubViewport
+		var vp := bind.get_viewport() as Viewport
 		var same = vp_vis_same.get(vp, null) if vp else null
 		if !vp || same:
 			continue
@@ -174,7 +187,7 @@ func remove_bind(bind):
 func update_bind_visibility(bind):
 	var start = Time.get_ticks_usec()
 	var p = bind.get_parent()
-	var vp = bind.get_viewport() as SubViewport
+	var vp := bind.get_viewport() as Viewport
 	if p && p.is_visible_in_tree() && (!vp || vp_info.is_visible(vp)):
 		_vbind_plus += 1
 		if bind not in _visible_binds:

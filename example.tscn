@@ -1,10 +1,10 @@
 [gd_scene load_steps=7 format=3 uid="uid://ck6v3p607f1pn"]
 
-[ext_resource type="Script" uid="uid://7apnvjk601pl" path="res://addons/DataBindControls/binds.gd" id="1"]
+[ext_resource type="Script" uid="uid://njl7labrgiya" path="res://addons/DataBindControls/binds.gd" id="1"]
 [ext_resource type="Script" uid="uid://brmirx5b5w7d" path="res://example.gd" id="1_so716"]
-[ext_resource type="Script" uid="uid://b18nci1e4b2q6" path="res://addons/DataBindControls/bind_repeat.gd" id="3"]
+[ext_resource type="Script" uid="uid://cgr5wsrfaysbi" path="res://addons/DataBindControls/bind_repeat.gd" id="3"]
 [ext_resource type="PackedScene" uid="uid://ddkq3rwuwxo1d" path="res://repeated_example.tscn" id="4"]
-[ext_resource type="Script" uid="uid://b0lpi1usk4350" path="res://addons/DataBindControls/bind_items.gd" id="5"]
+[ext_resource type="Script" uid="uid://brbpqyughndw8" path="res://addons/DataBindControls/bind_items.gd" id="5"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
 bg_color = Color(0.196078, 0.196078, 0.196078, 1)

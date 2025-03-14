@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-version=4.3-stable
+version=4.4-stable
 
 run_test() {
     # this got a bit complicated because gut doesn't detect SCRIPT ERRORs :(
