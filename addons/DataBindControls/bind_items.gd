@@ -248,15 +248,15 @@ func _assign_item(items_target: Node, i: int, item) -> bool:
 func _enter_tree():
 	if Engine.is_editor_hint():
 		return
+	super._enter_tree()
 	_bind_item_control()
-	DataBindings.add_bind(self)
 
 
 func _exit_tree():
 	if Engine.is_editor_hint():
 		return
+	super._exit_tree()
 	_unbind_item_control()
-	DataBindings.remove_bind(self)
 
 
 func _bind_item_control():
