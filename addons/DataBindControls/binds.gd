@@ -223,7 +223,10 @@ func detect_changes() -> bool:
 			continue
 		var b := _binds[p] as String
 		if b:
-			var bt = _bound_targets[b]
+			var bt = _bound_targets.get(b)
+			if !bt:
+				bt = BindTarget.new(b, owner)
+				_bound_targets.set(b, bt)
 			assert(bt.root == owner)
 			var target = bt.get_target()
 			if target:
