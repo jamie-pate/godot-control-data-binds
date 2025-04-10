@@ -159,12 +159,12 @@ func _bind_target(p: String, parent: Node) -> void:
 		if target:
 			parent[p] = bt.get_value(target)
 	var sig_map = Util.get_sig_map(parent)
-	if p in SIGNAL_PROPS:
-		var sig = SIGNAL_PROPS[p]
-		if sig in sig_map:
-			var method = "_on_parent_prop_changed%s" % [len(sig_map[sig].args)]
-			var err = parent.connect(SIGNAL_PROPS[p], Callable(self, method).bind(p))
-			assert(err == OK)
+	var p_changed = "%s_changed" % [p]
+	var sig_name = SIGNAL_PROPS.get(p, p_changed)
+	if sig_name in sig_map:
+		var method = "_on_parent_prop_changed%s" % [len(sig_map[sig_name].args)]
+		var err = parent.connect(sig_name, Callable(self, method).bind(p))
+		assert(err == OK)
 
 
 func _exit_tree():
