@@ -22,43 +22,6 @@ var _vbind_plus: int
 var _vbind_minus: int
 var _vbind_time: int
 
-
-class DrawDetector:
-	## Detects when a SubViewport has had it's contents drawn
-	## Doesn't make sense to use this for Window since they always draw
-	extends Control
-
-	signal draw_requested
-
-	const META_KEY = "data_bindings_draw_detector"
-	var last_frame := 0
-
-	static func ensure(vp: SubViewport, callable: Callable):
-		if !vp.has_meta(META_KEY):
-			var dd := DrawDetector.new()
-			dd.draw_requested.connect(callable)
-			vp.set_meta(META_KEY, dd.get_instance_id())
-			vp.add_child(dd)
-
-	static func drawn(vp: SubViewport):
-		var id := vp.get_meta(META_KEY, null)
-		if id != null:
-			var dd = instance_from_id(id)
-			if !dd || dd is not DrawDetector:
-				vp.remove_meta(META_KEY)
-			else:
-				var fd := Engine.get_frames_drawn()
-				# was it drawn in the last few frames?
-				if dd.last_frame < fd - 2:
-					pass
-				return dd.last_frame >= fd - 2
-		return false
-
-	func _draw() -> void:
-		last_frame = Engine.get_frames_drawn()
-		draw_requested.emit()
-
-
 class ViewportInfo:
 	extends RefCounted
 
@@ -123,8 +86,12 @@ class ViewportInfo:
 			if mode == SubViewport.UPDATE_DISABLED:
 				result = 0
 			elif mode in [SubViewport.UPDATE_WHEN_VISIBLE, SubViewport.UPDATE_WHEN_PARENT_VISIBLE]:
-				DrawDetector.ensure(svp, _vp_changed)
-				result = 1 if DrawDetector.drawn(svp) else 0
+				var riv := RenderingServer.viewport_get_render_info(
+					vp.get_viewport_rid(),
+					RenderingServer.VIEWPORT_RENDER_INFO_TYPE_CANVAS,
+					RenderingServer.VIEWPORT_RENDER_INFO_DRAW_CALLS_IN_FRAME
+				)
+				result = 1 if riv > 0 || Engine.get_frames_drawn() < 2 else 0
 		else:
 			# window always draws
 			result = OFFSET + SubViewport.UPDATE_ALWAYS
