@@ -232,6 +232,8 @@ func detect_changes() -> bool:
 			if target:
 				var parent = get_parent()
 				var value = bt.get_value(target)
+				if parent is Slider && typeof(value) == TYPE_FLOAT:
+					value = snappedf(value, parent.step)
 				if !_equal_approx(parent[p], value):
 					_detected_change_log.append("%s: %s != %s" % [bt.full_path, parent[p], value])
 					changes_detected = true

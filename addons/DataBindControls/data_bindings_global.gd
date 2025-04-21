@@ -22,6 +22,7 @@ var _vbind_plus: int
 var _vbind_minus: int
 var _vbind_time: int
 
+
 class ViewportInfo:
 	extends RefCounted
 
