@@ -266,3 +266,23 @@ func change_count():
 
 func get_desc():
 	return "%s\n%s" % [get_path(), "\n".join(_detected_change_log)]
+
+
+## Special case where we should check the visiblity bind even when the parent
+## is not visible
+func has_visibility_bind():
+	return "visible" in _binds
+
+
+## Check whether the parent node should be visible because the visibility bind
+## evaluates to true
+func should_be_visible():
+	var p := get_parent()
+	if p:
+		var pp := p.get_parent()
+		if pp && pp.has_method("is_visible_in_tree") && pp.is_visible_in_tree():
+			var target = _binds.visible
+			var vt :BindTarget = _bound_targets[target]
+			var t = vt.get_target()
+			return pp.is_visible_in_tree() && t && vt.get_value(t)
+	return false

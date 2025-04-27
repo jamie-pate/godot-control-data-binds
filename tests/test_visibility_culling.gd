@@ -181,3 +181,20 @@ func test_vp_visibility_culling():
 	# wait for change detection to happen before ending the test
 	await get_tree().process_frame
 	assert(!DataBindings._change_detection_queued)
+
+
+func test_hidden_vis_bound():
+	# test the special behavior of the visibility bind to be checked when
+	# the parent node is hidden
+	var vb_node = visibility_rig.get_node("%VisibilityRigContent").find_child(
+		"TextureRectVisibilityBound", true, false
+	)
+	var items = visibility_rig.get_items(false)
+	assert_true(vb_node.is_visible_in_tree())
+	assert_true(items[0].pressed)
+	items[0].pressed = false
+	DataBindings._detect_changes()
+	assert_false(vb_node.is_visible_in_tree())
+	items[0].pressed = true
+	DataBindings._detect_changes()
+	assert_true(vb_node.is_visible_in_tree())

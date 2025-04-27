@@ -157,3 +157,7 @@ func change_count():
 
 func get_desc():
 	return "%s: Repeat\n%s" % [get_path(), "\n".join(_detected_change_log)]
+
+
+func has_visibility_bind():
+	return false

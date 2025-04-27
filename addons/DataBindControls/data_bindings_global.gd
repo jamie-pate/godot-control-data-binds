@@ -16,6 +16,8 @@ var _detection_iterations := 0
 ## number of times _detect_changes() has been called
 var _detection_count := 0
 var _visible_binds: Dictionary
+## Hidden binds that still need to be checked because they bind visibility
+var _hidden_binds: Dictionary
 var _binds: Dictionary
 # count how many bind visibility updates happened
 var _vbind_plus: int
@@ -150,6 +152,7 @@ func add_bind(bind):
 func remove_bind(bind):
 	_binds.erase(bind)
 	_visible_binds.erase(bind)
+	_hidden_binds.erase(bind)
 
 
 func update_bind_visibility(bind):
@@ -160,10 +163,14 @@ func update_bind_visibility(bind):
 		_vbind_plus += 1
 		if bind not in _visible_binds:
 			_visible_binds[bind] = true
+			_hidden_binds.erase(bind)
 			detect_changes()
 	else:
 		_vbind_minus += 1
 		_visible_binds.erase(bind)
+		if bind.has_visibility_bind():
+			_hidden_binds[bind] = true
+			detect_changes()
 	_vbind_time += Time.get_ticks_usec() - start
 
 
@@ -191,7 +198,12 @@ func _detect_changes():
 		_change_detection_queued = false
 		changes_detected = false
 		var timings: Array[String]
-		for bind in _visible_binds.keys():
+		var hidden: Array
+		for bind in _hidden_binds.keys():
+			if bind.should_be_visible():
+				hidden.append(bind)
+
+		for bind in _visible_binds.keys() + hidden:
 			var b_start := Time.get_ticks_usec()
 			var cd := bind.detect_changes() as bool
 			if cd:

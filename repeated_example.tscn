@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://ddkq3rwuwxo1d"]
+[gd_scene load_steps=4 format=3 uid="uid://ddkq3rwuwxo1d"]
 
 [ext_resource type="Script" uid="uid://bth6gpf3mc1s" path="res://repeated_example.gd" id="1_qsp2h"]
 [ext_resource type="Script" uid="uid://njl7labrgiya" path="res://addons/DataBindControls/binds.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://b60l5qe7oucuh" path="res://eye.svg" id="2_5lfjy"]
 
 [node name="RepeatedControl" type="Panel"]
 custom_minimum_size = Vector2(0, 200)
@@ -40,6 +41,22 @@ physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("2")
 texture = "item.icon"
+
+[node name="TextureRectVisibilityBound" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("2_5lfjy")
+stretch_mode = 3
+
+[node name="Binds" type="Node" parent="VBoxContainer/HBoxContainer/TextureRectVisibilityBound"]
+_import_path = ""
+unique_name_in_owner = ""
+process_physics_priority = ""
+process_thread_group = ""
+physics_interpolation_mode = ""
+auto_translate_mode = ""
+script = ExtResource("2")
+visible = "item.pressed"
+metadata/_custom_type_script = ""
 
 [node name="Button" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
