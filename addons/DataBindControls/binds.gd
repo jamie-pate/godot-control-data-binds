@@ -282,7 +282,7 @@ func should_be_visible():
 		var pp := p.get_parent()
 		if pp && pp.has_method("is_visible_in_tree") && pp.is_visible_in_tree():
 			var target = _binds.visible
-			var vt :BindTarget = _bound_targets[target]
+			var vt: BindTarget = _bound_targets[target]
 			var t = vt.get_target()
 			return pp.is_visible_in_tree() && t && vt.get_value(t)
 	return false

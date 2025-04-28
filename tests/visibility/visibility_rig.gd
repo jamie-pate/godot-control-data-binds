@@ -61,18 +61,18 @@ func rig_visibility(content: bool, viewport: bool, dont_wait := false):
 	# reset _vbind_time so we don't double count time taken before this line
 	DataBindings._vbind_time = 0
 	var change_detected = (
-		DataBindings._change_detection_queued || DataBindings._detection_count > last_dc
+		DataBindings._change_detection_requested || DataBindings._detection_count > last_dc
 	)
 	if !change_detected:
 		# may take 2 frames if it's a viewport update
 		await get_tree().process_frame
 		change_detected = (
-			DataBindings._change_detection_queued || DataBindings._detection_count > last_dc
+			DataBindings._change_detection_requested || DataBindings._detection_count > last_dc
 		)
 	assert(!make_visible || change_detected)
 	if change_detected:
 		await get_tree().process_frame
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 
 	# Print how many binds are checked for visibility changes
 	# Note that viewport ancestor binds make be checked more than expected

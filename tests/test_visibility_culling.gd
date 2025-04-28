@@ -14,7 +14,7 @@ func before_each():
 	layer.add_child(visibility_rig)
 	add_child_autofree(layer)
 	await get_tree().process_frame
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 
 
 func _all_text_changed(changed_vrc, changed_svc = ""):
@@ -60,7 +60,7 @@ func test_visibility_culling():
 
 	# Hide /VisibilityRigContent
 	await visibility_rig.rig_visibility(false, true)
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 
 	assert_false(vrc_label.is_visible_in_tree(), "Label is visible in tree")
 	assert_false(
@@ -90,11 +90,11 @@ func test_visibility_culling():
 	)
 
 	assert_true(
-		DataBindings._change_detection_queued,
+		DataBindings._change_detection_requested,
 		"Change detection should be queued by visibility changes"
 	)
 	await get_tree().process_frame
-	assert_false(DataBindings._change_detection_queued, "Change detection should be done")
+	assert_false(DataBindings._change_detection_requested, "Change detection should be done")
 
 	assert_eq(vrc_label.text, "TEST3")
 	items[0].text = "TEST3a"
@@ -102,7 +102,7 @@ func test_visibility_culling():
 	assert_eq_deep(changed, _all_text_changed("TEST3 != TEST3a"))
 	# wait for change detection to happen before ending the test
 	await get_tree().process_frame
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 
 
 func test_vp_visibility_culling():
@@ -128,7 +128,7 @@ func test_vp_visibility_culling():
 
 	# Hide /SubViewportContainer
 	await visibility_rig.rig_visibility(true, false)
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 	assert(!DataBindings._vp_visibility_update_queued)
 	assert_false(
 		svp_label.get_viewport().get_parent().is_visible_in_tree(),
@@ -157,11 +157,11 @@ func test_vp_visibility_culling():
 	assert_true(svp_label.is_visible_in_tree(), "Label is visible in tree")
 
 	var dc = DataBindings._detection_count
-	if !DataBindings._change_detection_queued:
+	if !DataBindings._change_detection_requested:
 		await get_tree().process_frame
 	# it doesn't seem like we can actually catch the queued change detection when a viewport
 	# queues it, but we can check _detection_count to ensure it's actually happened.
-	if !DataBindings._change_detection_queued:
+	if !DataBindings._change_detection_requested:
 		assert_lt(
 			dc,
 			DataBindings._detection_count,
@@ -172,7 +172,7 @@ func test_vp_visibility_culling():
 		svp_label.get_node("Binds") in DataBindings._visible_binds,
 		"Label/Binds should be in _visible_binds"
 	)
-	assert_false(DataBindings._change_detection_queued, "Change detection should be done")
+	assert_false(DataBindings._change_detection_requested, "Change detection should be done")
 
 	assert_eq(svp_label.text, "TEST3")
 	items[0].text = "TEST3a"
@@ -180,7 +180,7 @@ func test_vp_visibility_culling():
 	assert_eq_deep(changed, _all_text_changed("TEST3 != TEST3a"))
 	# wait for change detection to happen before ending the test
 	await get_tree().process_frame
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 
 
 func test_hidden_vis_bound():

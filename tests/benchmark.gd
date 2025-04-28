@@ -6,13 +6,13 @@ const US_TO_MS = 1e-3
 
 func _run_bench(force_changes: bool):
 	await get_tree().process_frame
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 	DataBindings._detect_changes()
 	if force_changes:
 		$VisibilityRig.reverse_items()
 	# Force a new frame to ensure that the viewport_info cache is cleared
 	await get_tree().process_frame
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 	var d: int
 	var start := Time.get_ticks_usec()
 	DataBindings._detect_changes()
@@ -39,7 +39,7 @@ func _ready():
 	$VisibilityRig.fill_items(ITEM_COUNT)
 	await get_tree().process_frame
 
-	assert(!DataBindings._change_detection_queued)
+	assert(!DataBindings._change_detection_requested)
 	DataBindings._detect_changes()
 	var binds = DataBindings._binds.duplicate()
 	var bind_count = len(binds)
@@ -106,10 +106,20 @@ func _ready():
 		)
 		result = false
 	if times.all_vis1.it == 0 || times.all_vis1.ch == 0:
-		printerr("Making viewport binds visible should trigger change detection")
+		printerr(
+			(
+				"ERROR: Making viewport binds visible should trigger change detection iterations: %s changes: %s"
+				% [times.all_vis1.it, times.all_vis1.ch]
+			)
+		)
 		result = false
 	if times.all_vis2.it == 0 || times.all_vis2.ch == 0:
-		printerr("Making binds visible should trigger change detection")
+		printerr(
+			(
+				"ERROR: Making binds visible should trigger change detection iterations: %s changes: %s"
+				% [times.all_vis2.it, times.all_vis2.ch]
+			)
+		)
 		result = false
 	if len(OS.get_cmdline_user_args()):
 		var filename = OS.get_cmdline_user_args()[0]

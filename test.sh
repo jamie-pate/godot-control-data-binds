@@ -29,7 +29,11 @@ run_bench() {
     local cmd="$1"
     local output_json="${2:-benchmark.json}"
     "$cmd" --headless res://tests/benchmark.tscn -- "$output_json"
-    return $?
+    local result=$?
+    if [ $result != 0 ]; then
+        echo "ERRORS DETECTED: exiting with code $result" >&2
+    fi
+    return $result
 }
 
 bench_flag=1

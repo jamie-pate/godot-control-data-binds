@@ -8,7 +8,8 @@ const MAX_CHANGES_LOGGED = 20
 var slow_detection_threshold := 2 if EngineDebugger.is_active() && !OS.has_feature("mobile") else 8
 var vp_info := ViewportInfo.new()
 
-var _change_detection_queued := false
+var _change_detection_running := false
+var _change_detection_requested := false
 var _vp_visibility_update_queued := false
 var _changes_detected := 0
 ## Number of iterations taken in the most recent change detection
@@ -176,9 +177,14 @@ func update_bind_visibility(bind):
 
 ## queue change detection
 func detect_changes() -> void:
-	if _change_detection_queued:
+	assert(self == DataBindings)
+	if _change_detection_requested:
 		return
-	_change_detection_queued = true
+	if _change_detection_running:
+		# if there is a cd loop running, just raise the fact that somebody requested change detection
+		_change_detection_requested = true
+		return
+	_change_detection_requested = true
 	_detect_changes.call_deferred()
 
 
@@ -187,15 +193,16 @@ func _detect_changes():
 	# TODO: queue change detection per viewport root or control root?
 	# each piece of 2d UI change detection could happen on a separate frame, spreading out the load..
 	# 50 binds can take 1ms to check
-	_change_detection_queued = false
+	_change_detection_requested = false
+	_change_detection_running = true
 	_changes_detected = 0
 	var change_log := []
 	var i := 0
 	var changes_detected := true
 	var result := false
-	while changes_detected || _change_detection_queued:
+	while changes_detected || _change_detection_requested:
 		var start := Time.get_ticks_usec()
-		_change_detection_queued = false
+		_change_detection_requested = false
 		changes_detected = false
 		var timings: Array[String]
 		var hidden: Array
@@ -244,5 +251,5 @@ func _detect_changes():
 			result = true
 			break
 	_detection_iterations = i
-	_change_detection_queued = false
+	_change_detection_running = false
 	return result

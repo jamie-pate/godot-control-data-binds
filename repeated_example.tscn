@@ -56,7 +56,6 @@ physics_interpolation_mode = ""
 auto_translate_mode = ""
 script = ExtResource("2")
 visible = "item.pressed"
-metadata/_custom_type_script = ""
 
 [node name="Button" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
