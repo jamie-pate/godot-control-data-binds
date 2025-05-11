@@ -1,5 +1,7 @@
 extends Node
 
+signal _change_detection_completed()
+
 const Util = preload("./util.gd")
 
 const MAX_CHANGES = 100
@@ -186,6 +188,7 @@ func detect_changes() -> void:
 		return
 	_change_detection_requested = true
 	_detect_changes.call_deferred()
+	await _change_detection_completed
 
 
 func _detect_changes():
@@ -252,4 +255,5 @@ func _detect_changes():
 			break
 	_detection_iterations = i
 	_change_detection_running = false
+	_change_detection_completed.emit()
 	return result
